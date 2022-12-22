@@ -8,5 +8,5 @@ mod user;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    app::app_init().await
+    app::web::init().await
 }
