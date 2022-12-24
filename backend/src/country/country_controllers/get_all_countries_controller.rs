@@ -2,7 +2,7 @@ use actix_web::{get, web, HttpRequest, Responder, Result};
 
 use crate::country::{
     country_dtos::{
-        countries_api_response_dto::CountryApiResponseDto,
+        countries_api_response_dto::CountriesApiResponseDto,
         country_entity_api_dto::CountryEntityApiDto,
     },
     country_services::country_service::CountryService,
@@ -20,7 +20,7 @@ pub(crate) async fn handler(
         countries.push(CountryEntityApiDto::from(a_country));
     }
 
-    let response = CountryApiResponseDto {
+    let response = CountriesApiResponseDto {
         success: true,
         countries,
         message: None,
