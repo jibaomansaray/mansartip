@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 
 #[derive(Debug, Serialize, Deserialize)]
-pub(crate) struct CountryApiResponseDto {
+pub(crate) struct CountriesApiResponseDto {
   pub success: bool,
   pub countries: Vec<CountryEntityApiDto>,
   pub message: Option<String>,
