@@ -35,7 +35,7 @@ impl std::ops::Deref for AuthenticatedUser {
 }
 
 impl AuthenticatedUser {
-    pub fn entity(&self) -> UserEntity {
-        self.0.clone()
+    pub fn into_inner(self) -> UserEntity {
+        self.0
     }
 }
