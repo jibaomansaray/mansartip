@@ -1,16 +1,17 @@
 use crate::app::app_state::DbRow;
+use chrono::{DateTime, Utc};
 use sqlx::Row;
 
 #[derive(Debug)]
 pub struct CountryEntity {
     pub id: i32,
     pub internal_id: String,
-    pub year: i32,
+    pub year: u16,
     pub name: String,
     pub short: String,
-    pub group_points: i32,
+    pub group_points: u8,
     pub image: String,
-    pub deleted_at: String,
+    pub deleted_at: Option<DateTime<Utc>>,
 }
 
 impl Default for CountryEntity {
@@ -23,7 +24,7 @@ impl Default for CountryEntity {
             short: "".to_owned(),
             group_points: 0,
             image: "".to_owned(),
-            deleted_at: "".to_owned(),
+            deleted_at: None,
         }
     }
 }
@@ -33,9 +34,9 @@ impl CountryEntity {
         id: i32,
         internal_id: String,
         name: String,
-        year: i32,
+        year: u16,
         short: String,
-        group_points: i32,
+        group_points: u8,
         image: String,
     ) -> Self {
         Self {
@@ -46,7 +47,7 @@ impl CountryEntity {
             short,
             group_points,
             image,
-            deleted_at: "".to_owned(),
+            deleted_at: None,
         }
     }
 }
