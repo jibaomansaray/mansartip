@@ -3,7 +3,7 @@ use actix_web::{web, App, HttpServer};
 use dotenvy::dotenv;
 use std::env;
 
-use crate::{api_routes, country, public_routes, app::app_state::AppState};
+use crate::{api_routes, app::app_state::AppState, country, public_routes, user};
 
 pub async fn init() -> std::io::Result<()> {
     dotenv().ok();
@@ -27,6 +27,9 @@ pub async fn init() -> std::io::Result<()> {
                     config,
                     app_data.clone(),
                 )
+            })
+            .configure(|config| {
+                user::user_services::user_actix_config_service::configure(config, app_data.clone())
             })
             .service(fs::Files::new("/static", &static_assets_path).index_file("index.html"))
     })
