@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct CountryApiResponseDto {
   pub success: bool,
-  pub countries: Option<CountryEntityApiDto>,
+  pub country: Option<CountryEntityApiDto>,
   pub message: Option<String>,
   pub code: Option<String>,
 }
