@@ -6,5 +6,6 @@ use serde::{Deserialize, Serialize};
 pub(crate) struct CountryApiResponseDto {
   pub success: bool,
   pub countries: Vec<CountryEntityApiDto>,
-  pub message: Option<String>
+  pub message: Option<String>,
+  pub code: Option<String>,
 }
