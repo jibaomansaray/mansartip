@@ -1,22 +1,25 @@
-use crate::country::country_entities::Country;
+use super::country_repo_service::{CountryRepoService, CountryRepoServiceTrait};
+use crate::country::country_entities::CountryEntity;
 
-use super::country_repo_service::CountryRepoService;
-
-pub struct CountryService {
-    repo: CountryRepoService,
+pub struct CountryService<T = CountryRepoService> {
+    repo: T,
 }
 
-impl CountryService {
-    pub fn new(repo: CountryRepoService) -> Self {
+impl<T> CountryService<T>
+where
+    T: CountryRepoServiceTrait,
+{
+    pub fn new(repo: T) -> Self {
         Self { repo }
     }
 
-    pub async fn get_all_countries(&self) -> Vec<Country> {
+    pub async fn get_all_countries(&self) -> Vec<CountryEntity> {
         // @todo check permission
         self.repo.all().await
     }
 
-    pub async fn get_country_by_id(&self, id: i32) -> Option<Country> {
+    pub async fn get_country_by_id(&self, id: i32) -> Option<CountryEntity> {
+        // @todo check permission
         self.repo.find_one_by_id(id).await
     }
 }
