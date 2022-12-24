@@ -1,10 +1,7 @@
 use actix_web::{get, web, HttpRequest, Responder, Result};
 
 use crate::country::{
-    country_dtos::{
-        countries_api_response_dto::CountriesApiResponseDto,
-        country_entity_api_dto::CountryEntityApiDto,
-    },
+    country_dtos::countries_api_response_dto::CountriesApiResponseDto,
     country_services::country_service::CountryService,
 };
 
@@ -14,18 +11,6 @@ pub(crate) async fn handler(
     country_repo: web::Data<CountryService>,
 ) -> Result<impl Responder> {
     let country_entities = country_repo.as_ref().get_all_countries().await;
-    let mut countries = Vec::new();
 
-    for a_country in country_entities {
-        countries.push(CountryEntityApiDto::from(a_country));
-    }
-
-    let response = CountriesApiResponseDto {
-        success: true,
-        countries,
-        message: None,
-        code: None,
-    };
-
-    Ok(web::Json(response))
+    Ok(web::Json(CountriesApiResponseDto::new(country_entities)))
 }
