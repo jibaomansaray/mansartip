@@ -1,8 +1,7 @@
 use crate::app::app_state::DbRow;
+use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use sqlx::Row;
-use chrono::prelude::*;
-
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum UserRole {
@@ -18,6 +17,24 @@ pub enum UserType {
     Human,
     #[serde(rename = "bot")]
     Bot,
+}
+
+impl From<UserRole> for u32 {
+    fn from(role: UserRole) -> u32 {
+        match role {
+            UserRole::User => 1,
+            UserRole::Admin => 2,
+        }
+    }
+}
+
+impl From<UserType> for u32 {
+    fn from(user_type: UserType) -> u32 {
+        match user_type {
+            UserType::Human => 1,
+            UserType::Bot => 2,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
