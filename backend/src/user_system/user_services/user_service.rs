@@ -1,13 +1,13 @@
 use crate::user_system::user_entities::UserEntity;
 
-use super::user_repo_service::UserRepoService;
+use super::user_repo_service::{UserRepoService, UserRepoServiceTrait};
 
-pub struct UserService {
-    repo: UserRepoService,
+pub struct UserService<T = UserRepoService> {
+    repo: T,
 }
 
-impl UserService {
-    pub fn new(repo: UserRepoService) -> Self {
+impl<T> UserService<T> where T: UserRepoServiceTrait {
+    pub fn new(repo: T) -> Self {
         Self { repo }
     }
 
@@ -25,7 +25,8 @@ impl UserService {
     pub async fn log_user_in(&self, email_or_username: &str, password: &str) -> Option<UserEntity> {
         let user;
 
-        if email_or_username.contains("@") { // @todo make this more robust. Check for a valid `email` instead
+        if email_or_username.contains("@") {
+            // @todo make this more robust. Check for a valid `email` instead
             user = self.repo.find_user_by_email(email_or_username).await;
         } else {
             user = self.repo.find_user_by_username(email_or_username).await;
@@ -42,6 +43,11 @@ impl UserService {
 
     pub async fn authenticate_by_token(&self, token: &str) -> Option<UserEntity> {
         self.repo.find_user_by_token(token).await
+    }
+
+    pub async fn create_user(&self, user: UserEntity) -> Option<UserEntity> {
+        // @todo validate payload and apply business logic
+        self.repo.insert_user(user).await // store the data to a database
     }
 
     pub fn is_password_correct(user: &UserEntity, raw_password: &str) -> bool {
