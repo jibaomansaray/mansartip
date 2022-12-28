@@ -60,12 +60,8 @@ impl From<DbRow> for UserEntity {
     fn from(row: DbRow) -> Self {
         let username: String = row.try_get("username").unwrap_or_default();
         let created_at: Option<DateTime<Utc>> = match row.try_get("createdAt") {
-            Ok(date) => {
-                Some(date)
-            }
-            _ =>{
-                None
-            } ,
+            Ok(date) => Some(date),
+            _ => None,
         };
         let updated_at: Option<DateTime<Utc>> = match row.try_get("updatedAt") {
             Ok(date) => Some(date),
