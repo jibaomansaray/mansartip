@@ -8,4 +8,6 @@ pub fn register_api_routes(scope: Scope) -> Scope {
 
 pub fn register_public_routes(scope: Scope) -> Scope {
     scope.service(user_controllers::public_controllers::user_login_controller::handler)
+        .service(user_controllers::public_controllers::user_logout_controller::handler)
+        .service(user_controllers::public_controllers::user_signup_controller::handler)
 }
