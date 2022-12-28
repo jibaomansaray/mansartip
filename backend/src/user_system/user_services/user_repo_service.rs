@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{app::app_state::DbPool, user::user_entities::UserEntity};
+use crate::{app::app_state::DbPool, user_system::user_entities::UserEntity};
 use futures::stream::TryStreamExt;
 
 pub struct UserRepoService {
@@ -22,9 +22,7 @@ impl UserRepoService {
 
         match rows.try_next().await {
             Ok(user) => user,
-            _ => {
-                None
-            }
+            _ => None,
         }
         //  rows.try_next().await.expect("clould not find a user by id")
     }
@@ -39,9 +37,7 @@ impl UserRepoService {
 
         match rows.try_next().await {
             Ok(user) => user,
-            _ => {
-                None
-            }
+            _ => None,
         }
     }
 
@@ -54,9 +50,7 @@ impl UserRepoService {
 
         match rows.try_next().await {
             Ok(user) => user,
-            _ => {
-                None
-            }
+            _ => None,
         }
     }
 
@@ -70,26 +64,36 @@ impl UserRepoService {
 
         match rows.try_next().await {
             Ok(user) => user,
-            _ => {
-                None
-            }
+            _ => None,
         }
     }
 
-    pub async fn insert_user(&self, user: UserEntity ) -> Option<UserEntity> {
-      None
+    pub async fn find_user_by_username(&self, username: &str) -> Option<UserEntity> {
+        let sql = "SELECT * FROM `user` WHERE `username` = ? and `deletedAt` IS NULL";
+        let mut rows = sqlx::query(sql)
+            .bind(username)
+            .map(UserEntity::from)
+            .fetch(self.pool.as_ref());
+
+        match rows.try_next().await {
+            Ok(user) => user,
+            _ => None,
+        }
+    }
+
+    pub async fn insert_user(&self, user: UserEntity) -> Option<UserEntity> {
+        None
     }
 
     pub async fn update_user(&self, user: UserEntity) -> Option<UserEntity> {
-      None
+        None
     }
 
     pub async fn soft_delete_user(&self, id: i32) -> Option<UserEntity> {
-      None
+        None
     }
 
     pub async fn delete_user(&self, id: i32) -> Option<UserEntity> {
-      None
+        None
     }
-
 }

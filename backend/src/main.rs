@@ -4,7 +4,7 @@ mod country;
 mod game;
 mod general;
 mod public_routes;
-mod user;
+mod user_system;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

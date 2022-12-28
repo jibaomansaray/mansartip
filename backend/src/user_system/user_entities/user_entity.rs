@@ -22,6 +22,7 @@ pub enum UserType {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UserEntity {
+    #[serde(skip)]
     pub id: i32,
     pub internal_id: String,
     pub role: UserRole,

@@ -2,7 +2,7 @@ use std::future::{ready, Ready};
 
 use actix_web::{FromRequest, HttpMessage};
 
-use crate::user::user_entities::UserEntity;
+use crate::user_system::user_entities::UserEntity;
 
 use super::not_authenticated_error::NotAuthenticatedError;
 

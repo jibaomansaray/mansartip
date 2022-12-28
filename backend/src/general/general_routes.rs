@@ -1,13 +1,11 @@
-use actix_web::{Scope };
+use actix_web::Scope;
 
-use super::general_controllers:: {
-  index_page
-};
+use super::general_controllers::index_page;
 
 pub fn register_api_routes(scope: Scope) -> Scope {
-  scope
+    scope
 }
 
 pub fn register_public_routes(scope: Scope) -> Scope {
-  scope.service(index_page)
+    scope.service(index_page)
 }

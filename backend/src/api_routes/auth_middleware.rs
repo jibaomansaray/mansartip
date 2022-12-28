@@ -12,7 +12,7 @@ use futures_util::future::LocalBoxFuture;
 
 use crate::{
     app::app_helpers::app_request_helper::pluck_token_and_role,
-    user::user_services::user_service::UserService,
+    user_system::user_services::user_service::UserService,
 };
 
 pub struct Auth;

@@ -4,7 +4,7 @@ pub(crate) mod auth_middleware;
 
 use crate::country::country_routes;
 use crate::game::game_routes;
-use crate::user::user_routes;
+use crate::user_system::user_routes;
 
 pub fn configure(config: &mut web::ServiceConfig) {
     let mut api_routes = web::scope("/api/v1");
