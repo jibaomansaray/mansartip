@@ -103,3 +103,23 @@ impl From<DbRow> for UserEntity {
         }
     }
 }
+
+impl Default for UserEntity {
+    fn default() -> Self {
+        Self {
+            id: 0,
+            internal_id: "".to_owned(),
+            role: UserRole::User,
+            avater: "".to_owned(),
+            user_type: UserType::Human,
+            username: "".to_owned(),
+            email: "".to_owned(),
+            password: "".to_string(),
+            token: "".to_owned(), // @todo generate a real token here
+            data: "".to_owned(),
+            created_at: None,
+            updated_at: None,
+            deleted_at: None,
+        }
+    }
+}
