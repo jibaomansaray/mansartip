@@ -44,7 +44,7 @@ pub struct UserEntity {
     pub internal_id: String,
     pub role: UserRole,
     pub avater: String,
-    #[serde(rename = "type")] 
+    #[serde(rename = "type")]
     pub user_type: UserType,
     pub username: String,
     pub email: String,
