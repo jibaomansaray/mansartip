@@ -8,3 +8,8 @@ This is an attempt to port the node implementation,[node codebase](https://githu
 
 ```Node:``` Currently, only MySql/MariaDb are supported
 
+## Dev info
+Admin user
+- username: `admin`
+- password: `changeme`
+- token: `d834cb7c2e1fcaa541f8147a9b7ca11e1559c217b3ddbfdf59fc202fe6c53dc1`
