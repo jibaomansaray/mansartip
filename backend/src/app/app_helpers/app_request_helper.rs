@@ -91,23 +91,17 @@ pub(crate) fn pluck_role_from_header(req: &ServiceRequest) -> Option<String> {
 }
 
 /// Returns the current user's token and role
-/// 
+///
 /// The values are returned as a tuple where index 0 is the token
 pub(crate) fn pluck_token_and_role(req: &ServiceRequest) -> (Option<String>, Option<String>) {
     let mut response = (pluck_token_from_header(req), pluck_role_from_header(req));
 
-    match response.0 {
-        None => {
-            response.0 = pluck_token_from_query_string(req);
-        }
-        _ => (),
+    if response.0 == None {
+        response.0 = pluck_token_from_query_string(req);
     }
 
-    match response.1 {
-        None => {
-          response.1 = pluck_role_from_query_string(req);
-        } 
-        _ => ()
+    if response.1 == None {
+        response.1 = pluck_role_from_query_string(req);
     }
 
     response
