@@ -10,7 +10,7 @@ pub struct CreateUserFailedError {
 impl Default for CreateUserFailedError {
     fn default() -> Self {
         Self {
-            code: "create_user_field".to_owned(),
+            code: "create_user_failed".to_owned(),
             message: "Could not create User".to_owned(),
         }
     }
@@ -19,7 +19,7 @@ impl Default for CreateUserFailedError {
 impl fmt::Display for CreateUserFailedError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = serde_json::to_string(&self)
-            .unwrap_or_else(|_| String::from("user is not authenticated"));
+            .unwrap_or_else(|_| String::from("could not create user"));
         write!(f, "{message}")
     }
 }
