@@ -31,8 +31,9 @@ pub trait UserRepoServiceTrait {
     ) -> Option<UserEntity>;
     async fn insert_user(&self, user: UserEntity) -> Result<UserEntity, CreateUserFailedError>;
     async fn update_user(&self, user: UserEntity) -> Option<UserEntity>;
-    async fn soft_delete_user(&self, id: i32) -> Option<UserEntity>;
-    async fn delete_user(&self, id: i32) -> Option<UserEntity>;
+    async fn soft_delete_user(&self, user: UserEntity)
+        -> Result<UserEntity, UpdateUserFailedError>;
+    async fn delete_user(&self, user: UserEntity) -> Result<UserEntity, UpdateUserFailedError>;
 }
 
 impl UserRepoService {
