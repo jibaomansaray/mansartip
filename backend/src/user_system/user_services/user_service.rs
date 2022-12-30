@@ -1,4 +1,10 @@
-use crate::user_system::{user_entities::UserEntity, user_helpers::create_user_failed_error::CreateUserFailedError};
+use crate::user_system::{
+    user_entities::UserEntity,
+    user_helpers::{
+        create_user_failed_error::CreateUserFailedError,
+        update_user_failed_error::UpdateUserFailedError,
+    },
+};
 
 use super::user_repo_service::{UserRepoService, UserRepoServiceTrait};
 
@@ -56,17 +62,17 @@ where
     ) -> Result<UserEntity, CreateUserFailedError> {
         let mut user = UserEntity::default();
 
-        let user_alreay_exist= self
+        let user_alreay_exist = self
             .repo
             .find_user_by_username_or_email(username, email)
             .await;
 
-        match user_alreay_exist{
+        match user_alreay_exist {
             Some(_) => {
                 let mut error = CreateUserFailedError::default();
                 error.message = "A user already exist with this email or username".to_owned();
                 Err(error)
-            },
+            }
             None => {
                 // set received data
                 user.username = username.to_owned();
@@ -76,6 +82,34 @@ where
                 user.reset_token();
 
                 self.repo.insert_user(user).await // store the data to a database
+            }
+        }
+    }
+
+    pub async fn delete_my_account(
+        &self,
+        internal_id: &str,
+    ) -> Result<UserEntity, UpdateUserFailedError> {
+        self.delete_user(internal_id, false).await
+    }
+
+    pub async fn delete_user(
+        &self,
+        internal_id: &str,
+        soft_delete: bool,
+    ) -> Result<UserEntity, UpdateUserFailedError> {
+        match self.repo.find_user_by_internal_id(internal_id).await {
+            Some(user) => {
+                if soft_delete {
+                    self.repo.soft_delete_user(user).await
+                } else {
+                    self.repo.delete_user(user).await
+                }
+            }
+            None => {
+                let mut error = UpdateUserFailedError::default();
+                error.message = "User does not exist".to_owned();
+                Err(error)
             }
         }
     }
