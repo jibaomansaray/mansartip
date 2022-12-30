@@ -1,6 +1,11 @@
-use std::sync::Arc;
+use std::{collections::binary_heap, sync::Arc};
 
-use crate::{app::app_state::DbPool, user_system::user_entities::UserEntity};
+use crate::{
+    app::app_state::DbPool,
+    user_system::{
+        user_entities::UserEntity, user_helpers::create_user_failed_error::CreateUserFailedError,
+    },
+};
 use async_trait::async_trait;
 use futures::stream::TryStreamExt;
 
@@ -15,7 +20,12 @@ pub trait UserRepoServiceTrait {
     async fn find_user_by_token(&self, token: &str) -> Option<UserEntity>;
     async fn find_user_by_email(&self, email: &str) -> Option<UserEntity>;
     async fn find_user_by_username(&self, username: &str) -> Option<UserEntity>;
-    async fn insert_user(&self, user: UserEntity) -> Option<UserEntity>;
+    async fn find_user_by_username_or_email(
+        &self,
+        username: &str,
+        email: &str,
+    ) -> Option<UserEntity>;
+    async fn insert_user(&self, user: UserEntity) -> Result<UserEntity, CreateUserFailedError>;
     async fn update_user(&self, user: UserEntity) -> Option<UserEntity>;
     async fn soft_delete_user(&self, id: i32) -> Option<UserEntity>;
     async fn delete_user(&self, id: i32) -> Option<UserEntity>;
@@ -98,14 +108,54 @@ impl UserRepoServiceTrait for UserRepoService {
         }
     }
 
-    async fn insert_user(&self, user: UserEntity) -> Option<UserEntity> {
-        let _sql = "INSERT INTO `user` (`internalId`, `role`, `type`, `username`, `email`, `password`, `token`, `data`, `createdAt`, `updatedAt`, `deletedAt`)
-VALUES (?, ?, 1, 'username', 'email@email.com', 'password', 'token', NULL, now(), now(), NULL);";
+    async fn find_user_by_username_or_email(
+        &self,
+        username: &str,
+        email: &str,
+    ) -> Option<UserEntity> {
+        let sql =
+            "SELECT * FROM `user` WHERE `username` = ? OR `email` = ? and `deletedAt` IS NULL";
+
+        let mut rows = sqlx::query(sql)
+            .bind(username)
+            .bind(email)
+            .map(UserEntity::from)
+            .fetch(self.pool.as_ref());
+
+        match rows.try_next().await {
+            Ok(user) => user,
+            _ => None,
+        }
+    }
+
+    async fn insert_user(&self, user: UserEntity) -> Result<UserEntity, CreateUserFailedError> {
+        let sql = "INSERT INTO `user` (`internalId`, `role`, `type`, `username`, `email`, `password`, `token`, `data`, `createdAt`)
+VALUES (?, ?, ?, ?, ?, ?, ?, NULL, now());";
         // let role:u32 = user.role.parse().or_default(1);
+        let count = sqlx::query(sql)
+            .bind(user.internal_id)
+            .bind(u32::from(user.role))
+            .bind(u32::from(user.user_type))
+            .bind(user.username)
+            .bind(user.email.clone())
+            .bind(user.password)
+            .bind(user.token)
+            .execute(self.pool.as_ref())
+            .await;
 
-        dbg!(&user);
-
-        Some(user)
+        match count {
+            Ok(_) => self.find_user_by_email(&user.email).await.ok_or_else(|| {
+                let mut error = CreateUserFailedError::default();
+                error.message = "could not find the created user".to_owned();
+                error
+            }),
+            Err(e) => {
+                println!("error: {:?}", e);
+                let mut error = CreateUserFailedError::default();
+                error.message = e.to_string();
+                Err(error)
+            }
+        }
     }
 
     async fn update_user(&self, user: UserEntity) -> Option<UserEntity> {
