@@ -3,7 +3,11 @@ use std::{collections::binary_heap, sync::Arc};
 use crate::{
     app::app_state::DbPool,
     user_system::{
-        user_entities::UserEntity, user_helpers::create_user_failed_error::CreateUserFailedError,
+        user_entities::UserEntity,
+        user_helpers::{
+            create_user_failed_error::CreateUserFailedError,
+            update_user_failed_error::UpdateUserFailedError,
+        },
     },
 };
 use async_trait::async_trait;
