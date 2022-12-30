@@ -1,4 +1,8 @@
 use crate::user_system::{
+    user_dtos::{
+        user_entity_api_response_dto::UserEntityApiResponseDto,
+        user_entity_update_api_dto::UserEntityUpdateApiDto,
+    },
     user_entities::UserEntity,
     user_helpers::{
         create_user_failed_error::CreateUserFailedError,
@@ -32,14 +36,12 @@ where
 
     // @todo return a result?
     pub async fn log_user_in(&self, email_or_username: &str, password: &str) -> Option<UserEntity> {
-        let user;
-
-        if email_or_username.contains('@') {
+        let user = if email_or_username.contains('@') {
             // @todo make this more robust. Check for a valid `email` instead
-            user = self.repo.find_user_by_email(email_or_username).await;
+            self.repo.find_user_by_email(email_or_username).await
         } else {
-            user = self.repo.find_user_by_username(email_or_username).await;
-        }
+            self.repo.find_user_by_username(email_or_username).await
+        };
 
         if let Some(user) = user {
             if Self::is_password_correct(&user, password) {
@@ -69,8 +71,8 @@ where
 
         match user_alreay_exist {
             Some(_) => {
-                let mut error = CreateUserFailedError::default();
-                error.message = "A user already exist with this email or username".to_owned();
+                let error =
+                    CreateUserFailedError::new("A user already exist with this email or username");
                 Err(error)
             }
             None => {
@@ -107,8 +109,42 @@ where
                 }
             }
             None => {
-                let mut error = UpdateUserFailedError::default();
-                error.message = "User does not exist".to_owned();
+                let error = UpdateUserFailedError::new("User does not exist");
+                Err(error)
+            }
+        }
+    }
+
+    pub async fn update_user(
+        &self,
+        internal_id: &str,
+        mut data: UserEntityUpdateApiDto,
+        is_admin_update: bool,
+    ) -> Result<UserEntity, UpdateUserFailedError> {
+        match self.repo.find_user_by_internal_id(internal_id).await {
+            Some(user) => {
+                if !is_admin_update {
+                    data.token = None;
+                    data.role = None;
+                    data.user_type = None;
+                }
+
+                if data.password.is_some() {
+                    match data.password.as_ref() {
+                        Some(password) if password.len() > 4 => {
+                            if let Ok(pwd) = bcrypt::hash(&password, bcrypt::DEFAULT_COST) {
+                                data.password = Some(pwd);
+                                data.token = Some(UserEntity::generate_token())
+                            }
+                        }
+                        _ => (),
+                    }
+                }
+
+                self.repo.update_user(user, data).await
+            }
+            None => {
+                let error = UpdateUserFailedError::new("User does not exist");
                 Err(error)
             }
         }
