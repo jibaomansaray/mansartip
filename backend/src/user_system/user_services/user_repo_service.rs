@@ -1,4 +1,4 @@
-use std::{collections::binary_heap, sync::Arc};
+use std::{sync::Arc};
 
 use crate::{
     app::app_state::DbPool,
@@ -163,7 +163,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NULL, now());";
         }
     }
 
-    async fn update_user(&self, user: UserEntity) -> Option<UserEntity> {
+    async fn update_user(&self, _user: UserEntity) -> Option<UserEntity> {
         None
     }
 

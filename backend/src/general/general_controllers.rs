@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, HttpResponse, Responder};
+use actix_web::{get, HttpResponse, Responder};
 
 #[get("")]
 pub(crate) async fn index_page() -> impl Responder {

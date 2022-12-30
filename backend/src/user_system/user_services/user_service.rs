@@ -34,7 +34,7 @@ where
     pub async fn log_user_in(&self, email_or_username: &str, password: &str) -> Option<UserEntity> {
         let user;
 
-        if email_or_username.contains("@") {
+        if email_or_username.contains('@') {
             // @todo make this more robust. Check for a valid `email` instead
             user = self.repo.find_user_by_email(email_or_username).await;
         } else {
@@ -47,7 +47,7 @@ where
             }
         }
 
-        return None;
+        None
     }
 
     pub async fn authenticate_by_token(&self, token: &str) -> Option<UserEntity> {

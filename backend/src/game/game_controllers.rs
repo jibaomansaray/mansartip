@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, HttpResponse, Responder};
+use actix_web::{get, HttpResponse, Responder};
 
 #[get("match/todays")]
 pub(crate) async fn get_today_matches() -> impl Responder {

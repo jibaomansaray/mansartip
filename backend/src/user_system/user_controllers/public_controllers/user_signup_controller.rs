@@ -1,8 +1,7 @@
 use crate::{
     app::app_state::AppState,
     user_system::{
-        user_dtos::user_entity_api_response_dto::UserEntityApiResponseDto,
-        user_entities::UserEntity, user_services::user_service::UserService,
+        user_dtos::user_entity_api_response_dto::UserEntityApiResponseDto, user_services::user_service::UserService,
     },
 };
 use actix_web::{post, web, Responder, Result};

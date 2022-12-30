@@ -1,5 +1,5 @@
-use actix_web::{cookie::Cookie, post, web, HttpResponse, HttpResponseBuilder, Responder, Result};
-use cookie::{CookieJar, Key};
+use actix_web::{cookie::Cookie, post, web, HttpResponse, Responder, Result};
+
 use serde::{Deserialize, Serialize};
 
 use crate::{user_system::{

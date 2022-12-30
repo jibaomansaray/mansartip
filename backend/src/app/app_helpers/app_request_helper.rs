@@ -5,10 +5,10 @@ use actix_web::dev::ServiceRequest;
 /// Returns a HashMap of the query strings as key value
 pub(crate) fn split_query_string(req: &ServiceRequest) -> HashMap<String, Option<&str>> {
     let q_string = req.query_string();
-    let pieces = q_string.split("&");
+    let pieces = q_string.split('&');
     let mut response = HashMap::new();
     for a_piece in pieces {
-        let mut an_entry = a_piece.split("=");
+        let mut an_entry = a_piece.split('=');
 
         match an_entry.next() {
             Some(name) => {
