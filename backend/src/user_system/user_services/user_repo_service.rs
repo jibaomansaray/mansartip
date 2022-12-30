@@ -167,11 +167,44 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NULL, now());";
         None
     }
 
-    async fn soft_delete_user(&self, id: i32) -> Option<UserEntity> {
-        None
+    async fn soft_delete_user(
+        &self,
+        user: UserEntity,
+    ) -> Result<UserEntity, UpdateUserFailedError> {
+        let sql =
+            "UPDATE `user` SET `updatedAt` = now(), `deletedAt` = now() WHERE `internalId` = ?";
+
+        let count = sqlx::query(sql)
+            .bind(&user.internal_id)
+            .execute(self.pool.as_ref())
+            .await;
+        match count {
+            Ok(_) => Ok(user),
+            Err(e) => {
+                dbg!("error updating user: {:?}", &e);
+                let mut error = UpdateUserFailedError::default();
+                error.message = e.to_string();
+                Err(error)
+            }
+        }
     }
 
-    async fn delete_user(&self, id: i32) -> Option<UserEntity> {
-        None
+    async fn delete_user(&self, user: UserEntity) -> Result<UserEntity, UpdateUserFailedError> {
+        let sql = "DELETE from `user` WHERE `internalId` = ?";
+
+        let count = sqlx::query(sql)
+            .bind(&user.internal_id)
+            .execute(self.pool.as_ref())
+            .await;
+
+        match count {
+            Ok(_) => Ok(user),
+            Err(e) => {
+                dbg!("error updating user: {:?}", &e);
+                let mut error = UpdateUserFailedError::default();
+                error.message = e.to_string();
+                Err(error)
+            }
+        }
     }
 }
