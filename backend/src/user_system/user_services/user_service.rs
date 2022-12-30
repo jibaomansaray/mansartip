@@ -1,4 +1,4 @@
-use crate::user_system::user_entities::UserEntity;
+use crate::user_system::{user_entities::UserEntity, user_helpers::create_user_failed_error::CreateUserFailedError};
 
 use super::user_repo_service::{UserRepoService, UserRepoServiceTrait};
 
@@ -6,7 +6,10 @@ pub struct UserService<T = UserRepoService> {
     repo: T,
 }
 
-impl<T> UserService<T> where T: UserRepoServiceTrait {
+impl<T> UserService<T>
+where
+    T: UserRepoServiceTrait,
+{
     pub fn new(repo: T) -> Self {
         Self { repo }
     }
@@ -45,9 +48,36 @@ impl<T> UserService<T> where T: UserRepoServiceTrait {
         self.repo.find_user_by_token(token).await
     }
 
-    pub async fn create_user(&self, user: UserEntity) -> Option<UserEntity> {
-        // @todo validate payload and apply business logic
-        self.repo.insert_user(user).await // store the data to a database
+    pub async fn create_user(
+        &self,
+        username: &str,
+        email: &str,
+        password: &str,
+    ) -> Result<UserEntity, CreateUserFailedError> {
+        let mut user = UserEntity::default();
+
+        let user_alreay_exist= self
+            .repo
+            .find_user_by_username_or_email(username, email)
+            .await;
+
+        match user_alreay_exist{
+            Some(_) => {
+                let mut error = CreateUserFailedError::default();
+                error.message = "A user already exist with this email or username".to_owned();
+                Err(error)
+            },
+            None => {
+                // set received data
+                user.username = username.to_owned();
+                user.email = email.to_owned();
+                user.password = bcrypt::hash(password, bcrypt::DEFAULT_COST).unwrap_or_default();
+
+                user.reset_token();
+
+                self.repo.insert_user(user).await // store the data to a database
+            }
+        }
     }
 
     pub fn is_password_correct(user: &UserEntity, raw_password: &str) -> bool {
