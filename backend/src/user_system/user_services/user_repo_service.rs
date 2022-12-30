@@ -1,8 +1,12 @@
-use std::{sync::Arc};
+use std::sync::Arc;
 
 use crate::{
     app::app_state::DbPool,
     user_system::{
+        user_dtos::{
+            user_entity_api_response_dto::UserEntityApiResponseDto,
+            user_entity_update_api_dto::UserEntityUpdateApiDto,
+        },
         user_entities::UserEntity,
         user_helpers::{
             create_user_failed_error::CreateUserFailedError,
@@ -30,7 +34,11 @@ pub trait UserRepoServiceTrait {
         email: &str,
     ) -> Option<UserEntity>;
     async fn insert_user(&self, user: UserEntity) -> Result<UserEntity, CreateUserFailedError>;
-    async fn update_user(&self, user: UserEntity) -> Option<UserEntity>;
+    async fn update_user(
+        &self,
+        user: UserEntity,
+        data: UserEntityUpdateApiDto,
+    ) -> Result<UserEntity, UpdateUserFailedError>;
     async fn soft_delete_user(&self, user: UserEntity)
         -> Result<UserEntity, UpdateUserFailedError>;
     async fn delete_user(&self, user: UserEntity) -> Result<UserEntity, UpdateUserFailedError>;
@@ -150,21 +158,48 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NULL, now());";
 
         match count {
             Ok(_) => self.find_user_by_email(&user.email).await.ok_or_else(|| {
-                let mut error = CreateUserFailedError::default();
-                error.message = "could not find the created user".to_owned();
-                error
+                CreateUserFailedError::new("could not find the created user")
             }),
             Err(e) => {
                 dbg!("error creating user: {:?}", &e);
-                let mut error = CreateUserFailedError::default();
-                error.message = e.to_string();
+                let error = CreateUserFailedError::new(&e.to_string());
                 Err(error)
             }
         }
     }
 
-    async fn update_user(&self, _user: UserEntity) -> Option<UserEntity> {
-        None
+    async fn update_user(
+        &self,
+        user: UserEntity,
+        data: UserEntityUpdateApiDto,
+    ) -> Result<UserEntity, UpdateUserFailedError> {
+        let sql = "UPDATE `user` SET `role` = ?, `type` = ?, `username` = ?, `email` = ?, `password` = ?, `token` = ?, `updatedAt` = now() WHERE `internalId` = ?";
+
+        let count = sqlx::query(sql)
+            .bind(data.role_or(user.role))
+            .bind(data.user_type_or(user.user_type))
+            .bind(data.username_or(&user.username))
+            .bind(data.email_or(&user.email))
+            .bind(data.password_or(&user.password))
+            .bind(data.token_or(&user.token))
+            .bind(&user.internal_id)
+            .execute(self.pool.as_ref())
+            .await;
+
+        match count {
+            Ok(_) => match self.find_user_by_id(user.id).await {
+                Some(u) => Ok(u),
+                None => {
+                    let error = UpdateUserFailedError::new("could not find updated user");
+                    Err(error)
+                }
+            },
+            Err(e) => {
+                dbg!("error updating user: {:?}", &e);
+                let error = UpdateUserFailedError::new(&e.to_string());
+                Err(error)
+            }
+        }
     }
 
     async fn soft_delete_user(
@@ -182,8 +217,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NULL, now());";
             Ok(_) => Ok(user),
             Err(e) => {
                 dbg!("error updating user: {:?}", &e);
-                let mut error = UpdateUserFailedError::default();
-                error.message = e.to_string();
+                let error = UpdateUserFailedError::new(&e.to_string());
                 Err(error)
             }
         }
@@ -201,8 +235,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NULL, now());";
             Ok(_) => Ok(user),
             Err(e) => {
                 dbg!("error updating user: {:?}", &e);
-                let mut error = UpdateUserFailedError::default();
-                error.message = e.to_string();
+                let error = UpdateUserFailedError::new(&e.to_string());
                 Err(error)
             }
         }
