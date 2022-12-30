@@ -9,7 +9,8 @@ pub type DbPool = pool::Pool<MySql>;
 pub type DbRow = MySqlRow;
 
 pub struct AppState {
-  pub db_pool: Arc<Pool<MySql>>
+  pub db_pool: Arc<Pool<MySql>>,
+  pub vapid_public_key: String
 }
 
 impl  AppState {
@@ -24,7 +25,8 @@ impl  AppState {
         .expect("could not create database pool");
 
       Self {
-        db_pool: Arc::new(db_pool)
+        db_pool: Arc::new(db_pool),
+        vapid_public_key: std::env::var("VAPID_PUBLIC_KEY").unwrap_or_else(|_| String::from(""))
       }
    } 
 }
