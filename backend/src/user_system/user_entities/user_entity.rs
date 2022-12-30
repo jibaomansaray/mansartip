@@ -1,8 +1,8 @@
 use crate::app::app_state::DbRow;
 use chrono::prelude::*;
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 use sqlx::Row;
-use rand::Rng;
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -128,13 +128,17 @@ impl Default for UserEntity {
 
 impl UserEntity {
     pub fn reset_token(&mut self) {
-        let bytes = rand::thread_rng().gen::<[u8;32]>();
+        self.token = Self::generate_token()
+    }
+
+    pub fn generate_token() -> String {
+        let bytes = rand::thread_rng().gen::<[u8; 32]>();
         let mut hex = "".to_owned();
 
         for e in &bytes {
             hex += format!("{:x?}", e).as_str()
         }
 
-        self.token = hex;
+        hex
     }
 }
