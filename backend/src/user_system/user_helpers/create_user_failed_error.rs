@@ -1,16 +1,28 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+pub const DEFAULT_CODE: &str = "create_user_failed";
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateUserFailedError {
     pub code: String,
     pub message: String,
 }
 
+
+impl CreateUserFailedError {
+    pub fn new(message: &str) -> Self {
+        Self {
+            code: DEFAULT_CODE.to_owned(),
+            message: message.to_owned(),
+        }
+    }
+}
+
 impl Default for CreateUserFailedError {
     fn default() -> Self {
         Self {
-            code: "create_user_failed".to_owned(),
+            code: DEFAULT_CODE.to_owned(),
             message: "Could not create User".to_owned(),
         }
     }
