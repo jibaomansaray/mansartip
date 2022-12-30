@@ -6,25 +6,38 @@ pub(crate) struct UserEntityApiResponseDto<T = UserEntity> {
     pub success: bool,
     pub user: Option<T>,
     pub message: Option<String>,
-    pub code: Option<String>
+    pub code: Option<String>,
+    pub push_vapid: Option<String>,
 }
 
 impl<T> UserEntityApiResponseDto<T> {
     pub fn new(entity: T) -> Self {
-      Self {
-        success: true,
-        user: Some(entity),
-        message: None,
-        code: None
-      }
+        Self {
+            success: true,
+            user: Some(entity),
+            message: None,
+            code: None,
+            push_vapid: None,
+        }
+    }
+
+    pub fn new_auth_entity(entity: T, push_vapid: Option<String>) -> Self {
+        Self {
+            success: true,
+            user: Some(entity),
+            message: None,
+            code: None,
+            push_vapid,
+        }
     }
 
     pub fn new_not_found(message: Option<String>, code: Option<String>) -> Self {
-      Self {
-        success: false,
-        user: None,
-        message: message.or_else(|| Some(String::from("User not found"))),
-        code: code.or_else(|| Some(String::from("user_not_found")))
-      }
+        Self {
+            success: false,
+            user: None,
+            message: message.or_else(|| Some(String::from("User not found"))),
+            code: code.or_else(|| Some(String::from("user_not_found"))),
+            push_vapid: None,
+        }
     }
 }
