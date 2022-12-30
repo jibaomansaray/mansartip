@@ -2,6 +2,8 @@ use crate::app::app_state::DbRow;
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use sqlx::Row;
+use rand::Rng;
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum UserRole {
@@ -108,7 +110,7 @@ impl Default for UserEntity {
     fn default() -> Self {
         Self {
             id: 0,
-            internal_id: "".to_owned(),
+            internal_id: Uuid::new_v4().to_string(),
             role: UserRole::User,
             avater: "".to_owned(),
             user_type: UserType::Human,
