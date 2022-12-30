@@ -155,7 +155,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NULL, now());";
                 error
             }),
             Err(e) => {
-                println!("error: {:?}", e);
+                dbg!("error creating user: {:?}", &e);
                 let mut error = CreateUserFailedError::default();
                 error.message = e.to_string();
                 Err(error)
