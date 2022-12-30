@@ -1,3 +1,4 @@
 pub mod user_my_information_controller;
 pub mod user_vapid_key_controller;
 pub mod user_delete_my_account_controller;
+pub mod user_update_controller;
