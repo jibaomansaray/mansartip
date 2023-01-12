@@ -1,7 +1,12 @@
 use std::fmt;
 
-use actix_web::ResponseError;
-use serde::{Serialize, Deserialize};
+use actix_web::{
+    body::BoxBody,
+    http::header::{self, TryIntoHeaderValue, HeaderValue},
+    web,
+    HttpResponse, ResponseError, HttpResponseBuilder,
+};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NotAuthenticatedError {
@@ -24,6 +29,12 @@ impl Default for NotAuthenticatedError {
 impl ResponseError for NotAuthenticatedError {
     fn status_code(&self) -> actix_web::http::StatusCode {
         actix_web::http::StatusCode::UNAUTHORIZED
+    }
+
+    fn error_response(&self) -> HttpResponse<BoxBody> {
+        let mut response  = HttpResponse::with_body(self.status_code(), serde_json::to_string(&self).unwrap());
+        response.headers_mut().insert(header::CONTENT_TYPE, HeaderValue::from_static("application/json"));
+        response.map_into_boxed_body()
     }
 }
 

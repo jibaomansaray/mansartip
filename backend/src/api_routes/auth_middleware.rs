@@ -5,7 +5,7 @@ use std::{
 
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
-    web, Error, HttpMessage,
+    web, Error, HttpMessage, HttpResponse,
 };
 use futures::FutureExt;
 use futures_util::future::LocalBoxFuture;
@@ -82,12 +82,11 @@ where
 
             // if !is_authenticated {
             //     println!("Authentication failed");
-            //     let t = HttpResponse::Ok().body("You rare not authenticated");
-            //     let response = HttpResponse::Unauthorized()
-            //         .body("not authenticated");
-            //     let r : ServiceResponse<B> = ServiceResponse::new(req.request().clone(), response.try_into().unwrap());
-            //     Ok(r)
-            // } else {
+            //     let t = HttpResponse::Ok().body("You are not authenticated");
+            //     let response: HttpResponse = HttpResponse::Unauthorized()
+            //         .json("not authenticated");
+            //     let r : ServiceResponse<B> = ServiceResponse::new(req.request().clone(), response);
+            //     return Ok(r);
             // }
 
             println!("Authentication passed: {}", is_authenticated);

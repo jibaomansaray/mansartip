@@ -2,7 +2,7 @@ use actix_web::{post, web, HttpResponse, Responder};
 
 use serde::{Deserialize, Serialize};
 
-use crate::country::country_services::country_service::CountryService;
+use crate::country_system::country_services::country_service::CountryService;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct NewCountryPayload {

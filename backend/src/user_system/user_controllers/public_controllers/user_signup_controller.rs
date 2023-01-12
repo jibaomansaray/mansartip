@@ -27,11 +27,11 @@ pub(crate) async fn handler(
     match result {
         Ok(user_entity) => Ok(web::Json(UserEntityApiResponseDto::new_auth_entity(
             user_entity,
-            Some(app_data.vapid_public_key.clone()),
+            Some(&app_data.vapid_public_key),
         ))),
         Err(e) => Ok(web::Json(UserEntityApiResponseDto::new_not_found(
-            Some(e.message),
-            Some(e.code),
+            Some(&e.message),
+            Some(&e.code),
         ))),
     }
 }

@@ -1,5 +1,5 @@
 use super::country_repo_service::{CountryRepoService, CountryRepoServiceTrait};
-use crate::country::country_entities::CountryEntity;
+use crate::country_system::country_entities::CountryEntity;
 
 pub struct CountryService<T = CountryRepoService> {
     repo: T,

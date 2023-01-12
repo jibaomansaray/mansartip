@@ -17,13 +17,9 @@ use crate::{
 use async_trait::async_trait;
 use futures::stream::TryStreamExt;
 
-pub struct UserRepoService {
-    pool: Arc<DbPool>,
-}
-
 #[async_trait]
 pub trait UserRepoServiceTrait {
-    async fn find_user_by_id(&self, id: i32) -> Option<UserEntity>;
+    async fn find_user_by_id(&self, id: u64) -> Option<UserEntity>;
     async fn find_user_by_internal_id(&self, id: &str) -> Option<UserEntity>;
     async fn find_user_by_token(&self, token: &str) -> Option<UserEntity>;
     async fn find_user_by_email(&self, email: &str) -> Option<UserEntity>;
@@ -43,6 +39,9 @@ pub trait UserRepoServiceTrait {
         -> Result<UserEntity, UpdateUserFailedError>;
     async fn delete_user(&self, user: UserEntity) -> Result<UserEntity, UpdateUserFailedError>;
 }
+pub struct UserRepoService {
+    pool: Arc<DbPool>,
+}
 
 impl UserRepoService {
     pub fn new(pool: Arc<DbPool>) -> Self {
@@ -52,7 +51,7 @@ impl UserRepoService {
 
 #[async_trait]
 impl UserRepoServiceTrait for UserRepoService {
-    async fn find_user_by_id(&self, id: i32) -> Option<UserEntity> {
+    async fn find_user_by_id(&self, id: u64) -> Option<UserEntity> {
         let sql = "SELECT * FROM `user` WHERE `id` = ? and `deletedAt` IS NULL";
 
         let mut rows = sqlx::query(sql)
@@ -64,7 +63,6 @@ impl UserRepoServiceTrait for UserRepoService {
             Ok(user) => user,
             _ => None,
         }
-        //  rows.try_next().await.expect("clould not find a user by id")
     }
 
     async fn find_user_by_internal_id(&self, id: &str) -> Option<UserEntity> {
@@ -147,8 +145,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NULL, now());";
         // let role:u32 = user.role.parse().or_default(1);
         let count = sqlx::query(sql)
             .bind(user.internal_id)
-            .bind(u32::from(user.role))
-            .bind(u32::from(user.user_type))
+            .bind(u64::from(user.role))
+            .bind(u64::from(user.user_type))
             .bind(user.username)
             .bind(user.email.clone())
             .bind(user.password)

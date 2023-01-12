@@ -1,4 +1,4 @@
-use crate::{app::app_state::DbPool, country::country_entities::CountryEntity};
+use crate::{app::app_state::DbPool, country_system::country_entities::CountryEntity};
 use async_trait::async_trait;
 use futures::stream::TryStreamExt;
 use std::sync::Arc;

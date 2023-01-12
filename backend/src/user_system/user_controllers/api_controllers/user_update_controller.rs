@@ -19,8 +19,8 @@ pub(crate) async fn handler(
     {
         Ok(user) => Ok(web::Json(UserEntityApiResponseDto::new(user))),
         Err(e) => Ok(web::Json(UserEntityApiResponseDto::new_not_found(
-            Some(e.message),
-            Some(e.code),
+            Some(&e.message),
+            Some(&e.code),
         ))),
     }
 }

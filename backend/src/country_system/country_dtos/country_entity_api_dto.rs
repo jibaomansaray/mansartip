@@ -1,13 +1,15 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::country::country_entities::CountryEntity;
+use crate::country_system::country_entities::CountryEntity;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub(crate) struct CountryEntityApiDto {
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CountryEntityApiDto {
+    #[serde(skip)]
+    id: u64,
     internal_id: String,
     name: String,
-    year: u16,
+    year: i16,
     short: String,
     group_points: u8,
     image: String,
@@ -17,6 +19,7 @@ pub(crate) struct CountryEntityApiDto {
 impl From<CountryEntity> for CountryEntityApiDto {
     fn from(entity: CountryEntity) -> Self {
         Self {
+            id: entity.id,
             internal_id: entity.internal_id,
             name: entity.name,
             year: entity.year,

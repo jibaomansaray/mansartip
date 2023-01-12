@@ -24,7 +24,7 @@ where
         Self { repo }
     }
 
-    pub async fn get_user_by_id(&self, id: i32) -> Option<UserEntity> {
+    pub async fn get_user_by_id(&self, id: u64) -> Option<UserEntity> {
         // @todo check permission
         self.repo.find_user_by_id(id).await
     }

@@ -7,6 +7,8 @@ pub fn register_api_routes(scope: Scope) -> Scope {
         .service(user_controllers::api_controllers::user_vapid_key_controller::handler)
         .service(user_controllers::api_controllers::user_delete_my_account_controller::handler)
         .service(user_controllers::api_controllers::user_update_controller::handler)
+        .service(user_controllers::api_controllers::user_subscribe_to_notification_controller::handler)
+        .service(user_controllers::api_controllers::user_unsubscribe_to_notification_controller::handler)
 }
 
 pub fn register_public_routes(scope: Scope) -> Scope {

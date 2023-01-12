@@ -1,4 +1,4 @@
-use crate::app::app_state::DbRow;
+use crate::app::{app_state::DbRow, app_helpers::database_datetime_helper::{updated_at_field_value, created_at_field_value, deleted_at_field_value}};
 use chrono::prelude::*;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -21,8 +21,8 @@ pub enum UserType {
     Bot,
 }
 
-impl From<UserRole> for u32 {
-    fn from(role: UserRole) -> u32 {
+impl From<UserRole> for u64 {
+    fn from(role: UserRole) -> u64 {
         match role {
             UserRole::User => 1,
             UserRole::Admin => 2,
@@ -30,8 +30,8 @@ impl From<UserRole> for u32 {
     }
 }
 
-impl From<UserType> for u32 {
-    fn from(user_type: UserType) -> u32 {
+impl From<UserType> for u64 {
+    fn from(user_type: UserType) -> u64 {
         match user_type {
             UserType::Human => 1,
             UserType::Bot => 2,
@@ -42,7 +42,7 @@ impl From<UserType> for u32 {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UserEntity {
     #[serde(skip)]
-    pub id: i32,
+    pub id: u64,
     pub internal_id: String,
     pub role: UserRole,
     pub avater: String,
@@ -61,19 +61,6 @@ pub struct UserEntity {
 impl From<DbRow> for UserEntity {
     fn from(row: DbRow) -> Self {
         let username: String = row.try_get("username").unwrap_or_default();
-        let created_at: Option<DateTime<Utc>> = match row.try_get("createdAt") {
-            Ok(date) => Some(date),
-            _ => None,
-        };
-        let updated_at: Option<DateTime<Utc>> = match row.try_get("updatedAt") {
-            Ok(date) => Some(date),
-            _ => None,
-        };
-        let deleted_at: Option<DateTime<Utc>> = match row.try_get("deletedAt") {
-            Ok(date) => Some(date),
-            _ => None,
-        };
-
         Self {
             id: row.try_get("id").unwrap_or_default(),
             internal_id: row.try_get("internalId").unwrap_or_default(),
@@ -99,9 +86,9 @@ impl From<DbRow> for UserEntity {
             token: row.try_get("token").unwrap_or_default(),
             data: row.try_get("data").unwrap_or_default(),
             avater: format!("/static/user/{}.png", username),
-            created_at,
-            updated_at,
-            deleted_at,
+            created_at: created_at_field_value(&row),
+            updated_at: updated_at_field_value(&row),
+            deleted_at: deleted_at_field_value(&row),
         }
     }
 }
@@ -117,7 +104,7 @@ impl Default for UserEntity {
             username: "".to_owned(),
             email: "".to_owned(),
             password: "".to_string(),
-            token: "".to_owned(), // @todo generate a real token here
+            token: Self::generate_token(), 
             data: "".to_owned(),
             created_at: None,
             updated_at: None,

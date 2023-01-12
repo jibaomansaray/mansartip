@@ -29,14 +29,14 @@ pub(crate) async fn handler(
 
         let response = HttpResponse::Ok()
             .cookie(cookie)
-            .json(web::Json(UserEntityApiResponseDto::new_auth_entity(auth_user, Some(app_data.vapid_public_key.clone()))));
+            .json(web::Json(UserEntityApiResponseDto::new_auth_entity(auth_user, Some(&app_data.vapid_public_key))));
 
         Ok(response)
     } else {
         let response = HttpResponse::Ok().json(web::Json(
             UserEntityApiResponseDto::<UserEntity>::new_not_found(
-                Some(String::from("posted data is incorrect")),
-                Some(String::from("posted_data_incorrect")),
+                Some("posted data is incorrect"),
+                Some("posted_data_incorrect"),
             ),
         ));
 

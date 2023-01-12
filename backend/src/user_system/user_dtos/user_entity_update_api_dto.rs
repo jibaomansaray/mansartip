@@ -45,19 +45,19 @@ impl UserEntityUpdateApiDto {
         }
     }
 
-    pub(crate) fn role_or(&self, default: UserRole) -> u32 {
+    pub(crate) fn role_or(&self, default: UserRole) -> u64 {
         if let Some(s) = self.role.as_ref() {
-            u32::from(s.clone())
+            u64::from(s.clone())
         } else {
-            u32::from(default)
+            u64::from(default)
         }
     }
 
-    pub(crate) fn user_type_or(&self, default: UserType) -> u32 {
+    pub(crate) fn user_type_or(&self, default: UserType) -> u64 {
         if let Some(s) = self.user_type.as_ref() {
-            u32::from(s.clone())
+            u64::from(s.clone())
         } else {
-            u32::from(default)
+            u64::from(default)
         }
     }
 }

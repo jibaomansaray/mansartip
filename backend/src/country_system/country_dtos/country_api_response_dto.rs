@@ -1,4 +1,4 @@
-use crate::country::country_entities::CountryEntity;
+use crate::country_system::country_entities::CountryEntity;
 
 use super::country_entity_api_dto::CountryEntityApiDto;
 use serde::{Deserialize, Serialize};
