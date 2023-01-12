@@ -1,4 +1,4 @@
--- Adminer 4.8.1 MySQL 5.5.5-10.6.5-MariaDB-1:10.6.5+maria~focal dump
+-- Adminer 4.8.1 MySQL 5.5.5-10.10.2-MariaDB-1:10.10.2+maria~ubu2204 dump
 
 SET NAMES utf8;
 SET time_zone = '+00:00';
@@ -7,27 +7,30 @@ SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 SET NAMES utf8mb4;
 
+CREATE DATABASE `rs_worldcup` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
+USE `rs_worldcup`;
+
 DROP TABLE IF EXISTS `chat_message`;
 CREATE TABLE `chat_message` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `internalId` varchar(36) NOT NULL,
   `message` varchar(512) NOT NULL,
   `type` enum('message','image','video') NOT NULL DEFAULT 'message',
   `createdAt` datetime(6) NOT NULL DEFAULT current_timestamp(6),
   `updatedAt` datetime(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
-  `fromId` int(11) NOT NULL,
-  `roomId` int(11) NOT NULL,
+  `fromId` bigint(20) unsigned NOT NULL,
+  `roomId` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_0e017c7444083eb6bf16dff0d01` (`fromId`),
   KEY `FK_55dfd6d1589749727a7ef2d121f` (`roomId`),
-  CONSTRAINT `FK_0e017c7444083eb6bf16dff0d01` FOREIGN KEY (`fromId`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_55dfd6d1589749727a7ef2d121f` FOREIGN KEY (`roomId`) REFERENCES `chat_room` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `chat_message_ibfk_1` FOREIGN KEY (`fromId`) REFERENCES `user` (`id`),
+  CONSTRAINT `chat_message_ibfk_2` FOREIGN KEY (`roomId`) REFERENCES `chat_room` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `chat_room`;
 CREATE TABLE `chat_room` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `internalId` varchar(36) NOT NULL,
   `name` varchar(255) NOT NULL,
   `type` enum('one2one','public') NOT NULL DEFAULT 'public',
@@ -35,23 +38,23 @@ CREATE TABLE `chat_room` (
   `deletedAt` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `IDX_9ef6ce8864fa24adf15554a3a1` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `chat_room` (`id`, `internalId`, `name`, `type`, `createdAt`, `deletedAt`) VALUES
 (1,	'7a0205ce-7194-4486-a325-13660f9be1a2',	'General',	'public',	'2022-12-10 13:25:19.117568',	NULL);
 
 DROP TABLE IF EXISTS `country`;
 CREATE TABLE `country` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `internalId` varchar(2) NOT NULL,
-  `year` int(11) NOT NULL,
+  `year` smallint(4) unsigned NOT NULL,
   `name` varchar(255) NOT NULL,
   `short` varchar(5) NOT NULL,
   `groupPoints` int(11) NOT NULL DEFAULT 0,
   `image` varchar(255) NOT NULL,
   `deletedAt` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `country` (`id`, `internalId`, `year`, `name`, `short`, `groupPoints`, `image`, `deletedAt`) VALUES
 (1,	'A1',	2022,	'Qatar',	'QAT',	0,	'QAT_qatar.png',	NULL),
@@ -89,7 +92,8 @@ INSERT INTO `country` (`id`, `internalId`, `year`, `name`, `short`, `groupPoints
 
 DROP TABLE IF EXISTS `match`;
 CREATE TABLE `match` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `internalId` varchar(34) NOT NULL,
   `status` enum('pending','open','close','score_entered','completed') NOT NULL DEFAULT 'pending',
   `year` int(11) NOT NULL,
   `number` int(11) NOT NULL,
@@ -103,91 +107,109 @@ CREATE TABLE `match` (
   `countryAPenaltyGoals` int(11) NOT NULL DEFAULT 0,
   `countryBPenaltyGoals` int(11) NOT NULL DEFAULT 0,
   `toConfigureOn` date DEFAULT NULL,
-  `countryAId` int(11) DEFAULT NULL,
-  `countryBId` int(11) DEFAULT NULL,
-  `winnerId` int(11) DEFAULT NULL,
+  `countryAId` bigint(20) unsigned DEFAULT NULL,
+  `countryBId` bigint(20) unsigned DEFAULT NULL,
+  `winnerId` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_b19a0950d34feb9412a2fd93b0e` (`countryAId`),
   KEY `FK_7dc6c5b4773f8afe5a49a1e40ca` (`countryBId`),
   KEY `FK_367ddf891f920aae1b667353193` (`winnerId`),
-  CONSTRAINT `FK_367ddf891f920aae1b667353193` FOREIGN KEY (`winnerId`) REFERENCES `country` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_7dc6c5b4773f8afe5a49a1e40ca` FOREIGN KEY (`countryBId`) REFERENCES `country` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_b19a0950d34feb9412a2fd93b0e` FOREIGN KEY (`countryAId`) REFERENCES `country` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `match_ibfk_1` FOREIGN KEY (`winnerId`) REFERENCES `country` (`id`),
+  CONSTRAINT `match_ibfk_2` FOREIGN KEY (`countryAId`) REFERENCES `country` (`id`),
+  CONSTRAINT `match_ibfk_3` FOREIGN KEY (`countryBId`) REFERENCES `country` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `match` (`id`, `status`, `year`, `number`, `date`, `time`, `round`, `match`, `penalty`, `countryAGoals`, `countryBGoals`, `countryAPenaltyGoals`, `countryBPenaltyGoals`, `toConfigureOn`, `countryAId`, `countryBId`, `winnerId`) VALUES
-(1,	'completed',	2022,	1,	'2022-11-20',	'16:00:00',	'group',	'A1 v. A2',	0,	1,	11,	0,	0,	NULL,	1,	2,	2),
-(2,	'completed',	2022,	2,	'2022-11-21',	'16:00:00',	'group',	'A3 v. A4',	0,	2,	6,	0,	0,	NULL,	3,	4,	4),
-(3,	'completed',	2022,	3,	'2022-11-21',	'13:00:00',	'group',	'B1 v. B2',	0,	11,	10,	0,	0,	NULL,	5,	6,	5),
-(4,	'completed',	2022,	4,	'2022-11-21',	'19:00:00',	'group',	'B3 v. B4',	0,	8,	8,	0,	0,	NULL,	7,	8,	NULL),
-(5,	'completed',	2022,	5,	'2022-11-22',	'19:00:00',	'group',	'D1 v. D4',	0,	12,	8,	0,	0,	NULL,	13,	16,	13),
-(6,	'completed',	2022,	6,	'2022-11-22',	'13:00:00',	'group',	'D2 v. D3',	0,	7,	10,	0,	0,	NULL,	14,	15,	15),
-(7,	'completed',	2022,	7,	'2022-11-22',	'16:00:00',	'group',	'C3 v. C4',	0,	8,	4,	0,	0,	NULL,	11,	12,	11),
-(8,	'completed',	2022,	8,	'2022-11-22',	'10:00:00',	'group',	'C1 v. C2',	0,	7,	10,	0,	0,	NULL,	9,	10,	10),
-(9,	'completed',	2022,	9,	'2022-11-23',	'19:00:00',	'group',	'F1 v. F2',	0,	6,	5,	0,	0,	NULL,	21,	22,	21),
-(10,	'completed',	2022,	10,	'2022-11-23',	'16:00:00',	'group',	'E1 v. E4',	0,	12,	9,	0,	0,	NULL,	17,	20,	17),
-(11,	'completed',	2022,	11,	'2022-11-23',	'13:00:00',	'group',	'E2 v. E3',	0,	9,	1,	0,	0,	NULL,	18,	19,	18),
-(12,	'completed',	2022,	12,	'2022-11-23',	'10:00:00',	'group',	'F3 v. F4',	0,	2,	6,	0,	0,	NULL,	23,	24,	24),
-(13,	'completed',	2022,	13,	'2022-11-24',	'10:00:00',	'group',	'G3 v. G4',	0,	12,	7,	0,	0,	NULL,	27,	28,	27),
-(14,	'completed',	2022,	14,	'2022-11-24',	'13:00:00',	'group',	'H3 v. H4',	0,	4,	11,	0,	0,	NULL,	31,	32,	32),
-(15,	'completed',	2022,	15,	'2022-11-24',	'16:00:00',	'group',	'H1 v. H2',	0,	1,	5,	0,	0,	NULL,	29,	30,	30),
-(16,	'completed',	2022,	16,	'2022-11-24',	'19:00:00',	'group',	'G1 v. G2',	0,	4,	10,	0,	0,	NULL,	25,	26,	26),
-(17,	'completed',	2022,	17,	'2022-11-25',	'10:00:00',	'group',	'B4 v. B2',	0,	11,	4,	0,	0,	NULL,	8,	6,	8),
-(18,	'completed',	2022,	18,	'2022-11-25',	'13:00:00',	'group',	'A1 v. A3',	0,	2,	10,	0,	0,	NULL,	1,	3,	3),
-(19,	'completed',	2022,	19,	'2022-11-25',	'16:00:00',	'group',	'A4 v. A2',	0,	1,	4,	0,	0,	NULL,	4,	2,	2),
-(20,	'completed',	2022,	20,	'2022-11-25',	'19:00:00',	'group',	'B1 v. B3',	0,	7,	5,	0,	0,	NULL,	5,	7,	5),
-(21,	'completed',	2022,	21,	'2022-11-26',	'10:00:00',	'group',	'D3 v. D4',	0,	7,	3,	0,	0,	NULL,	15,	16,	15),
-(22,	'completed',	2022,	22,	'2022-11-26',	'13:00:00',	'group',	'C4 v. C2',	0,	2,	6,	0,	0,	NULL,	12,	10,	10),
-(23,	'completed',	2022,	23,	'2022-11-26',	'16:00:00',	'group',	'D1 v. D2',	0,	9,	4,	0,	0,	NULL,	13,	14,	13),
-(24,	'completed',	2022,	24,	'2022-11-26',	'19:00:00',	'group',	'C1 v. C3',	0,	12,	8,	0,	0,	NULL,	9,	11,	9),
-(25,	'completed',	2022,	25,	'2022-11-27',	'10:00:00',	'group',	'E3 v. E4',	0,	8,	11,	0,	0,	NULL,	19,	20,	20),
-(26,	'completed',	2022,	26,	'2022-11-27',	'13:00:00',	'group',	'F1 v. F3',	0,	2,	7,	0,	0,	NULL,	21,	23,	23),
-(27,	'completed',	2022,	27,	'2022-11-27',	'16:00:00',	'group',	'F4 v. F2',	0,	2,	8,	0,	0,	NULL,	24,	22,	22),
-(28,	'completed',	2022,	28,	'2022-11-27',	'19:00:00',	'group',	'E1 v. E2',	0,	7,	3,	0,	0,	NULL,	17,	18,	17),
-(29,	'completed',	2022,	29,	'2022-11-28',	'10:00:00',	'group',	'G4 v. G2',	0,	12,	1,	0,	0,	NULL,	28,	26,	28),
-(30,	'completed',	2022,	30,	'2022-11-28',	'13:00:00',	'group',	'H4 v. H2',	0,	9,	10,	0,	0,	NULL,	32,	30,	30),
-(31,	'completed',	2022,	31,	'2022-11-28',	'16:00:00',	'group',	'G1 v. G3',	0,	2,	6,	0,	0,	NULL,	25,	27,	27),
-(32,	'completed',	2022,	32,	'2022-11-28',	'19:00:00',	'group',	'H1 v. H3',	0,	8,	1,	0,	0,	NULL,	29,	31,	29),
-(33,	'completed',	2022,	33,	'2022-11-29',	'19:00:00',	'group',	'B4 v. B1',	0,	1,	1,	0,	0,	NULL,	8,	5,	NULL),
-(34,	'completed',	2022,	34,	'2022-11-29',	'19:00:00',	'group',	'B2 v. B3',	0,	12,	1,	0,	0,	NULL,	6,	7,	6),
-(35,	'completed',	2022,	35,	'2022-11-29',	'15:00:00',	'group',	'A2 v. A3',	0,	12,	2,	0,	0,	NULL,	2,	3,	2),
-(36,	'completed',	2022,	36,	'2022-11-29',	'15:00:00',	'group',	'A4 v. A1',	0,	9,	7,	0,	0,	NULL,	4,	1,	4),
-(37,	'completed',	2022,	37,	'2022-11-30',	'15:00:00',	'group',	'D4 v. D2',	0,	8,	8,	0,	0,	NULL,	16,	14,	NULL),
-(38,	'completed',	2022,	38,	'2022-11-30',	'15:00:00',	'group',	'D3 v. D1',	0,	3,	9,	0,	0,	NULL,	15,	13,	13),
-(39,	'completed',	2022,	39,	'2022-11-30',	'19:00:00',	'group',	'C4 v. C1',	0,	11,	10,	0,	0,	NULL,	12,	9,	12),
-(40,	'completed',	2022,	40,	'2022-11-30',	'19:00:00',	'group',	'C2 v. C3',	0,	7,	4,	0,	0,	NULL,	10,	11,	10),
-(41,	'completed',	2022,	41,	'2022-12-01',	'15:00:00',	'group',	'F4 v. F1',	0,	7,	10,	0,	0,	NULL,	24,	21,	21),
-(42,	'completed',	2022,	42,	'2022-12-01',	'15:00:00',	'group',	'F2 v. F3',	0,	10,	11,	0,	0,	NULL,	22,	23,	23),
-(43,	'completed',	2022,	43,	'2022-12-01',	'19:00:00',	'group',	'E3 v. E1',	0,	1,	8,	0,	0,	NULL,	19,	17,	17),
-(44,	'completed',	2022,	44,	'2022-12-01',	'19:00:00',	'group',	'E4 v. E2',	0,	3,	4,	0,	0,	NULL,	20,	18,	18),
-(45,	'completed',	2022,	45,	'2022-12-02',	'15:00:00',	'group',	'H2 v. H3',	0,	6,	8,	0,	0,	NULL,	30,	31,	31),
-(46,	'completed',	2022,	46,	'2022-12-02',	'15:00:00',	'group',	'H4 v. H1',	0,	8,	6,	0,	0,	NULL,	32,	29,	32),
-(47,	'completed',	2022,	47,	'2022-12-02',	'19:00:00',	'group',	'G2 v. G3',	0,	1,	4,	0,	0,	NULL,	26,	27,	27),
-(48,	'completed',	2022,	48,	'2022-12-02',	'19:00:00',	'group',	'G4 v. G1',	0,	4,	4,	0,	0,	NULL,	28,	25,	NULL),
-(49,	'completed',	2022,	49,	'2022-12-03',	'15:00:00',	'round_16',	'Winner:A v. Runner-up:B',	0,	4,	9,	0,	0,	'2022-12-01',	2,	8,	8),
-(50,	'completed',	2022,	50,	'2022-12-03',	'19:00:00',	'round_16',	'Winner:C v. Runner-up:D',	0,	6,	9,	0,	0,	'2022-12-01',	10,	15,	15),
-(51,	'completed',	2022,	51,	'2022-12-04',	'19:00:00',	'round_16',	'Winner:B v. Runner-up:A',	0,	12,	3,	0,	0,	'2022-12-02',	5,	4,	5),
-(52,	'completed',	2022,	52,	'2022-12-04',	'15:00:00',	'round_16',	'Winner:D v. Runner-up:C',	0,	9,	3,	0,	0,	'2022-12-02',	13,	9,	13),
-(53,	'completed',	2022,	53,	'2022-12-05',	'15:00:00',	'round_16',	'Winner:E v. Runner-up:F',	0,	10,	2,	0,	0,	'2022-12-03',	17,	23,	17),
-(54,	'completed',	2022,	54,	'2022-12-05',	'19:00:00',	'round_16',	'Winner:G v. Runner-up:H',	0,	9,	4,	0,	0,	'2022-12-03',	27,	32,	27),
-(55,	'completed',	2022,	55,	'2022-12-06',	'15:00:00',	'round_16',	'Winner:F v. Runner-up:E',	1,	7,	7,	6,	2,	'2022-12-04',	21,	18,	21),
-(56,	'completed',	2022,	56,	'2022-12-06',	'19:00:00',	'round_16',	'Winner:H v. Runner-up:G',	0,	3,	4,	0,	0,	'2022-12-04',	30,	28,	28),
-(57,	'completed',	2022,	57,	'2022-12-09',	'19:00:00',	'round_8',	'Winner:49 v. Winner:50',	0,	7,	1,	0,	0,	'2022-12-07',	8,	15,	8),
-(58,	'completed',	2022,	58,	'2022-12-09',	'15:00:00',	'round_8',	'Winner:53 v. Winner:54',	1,	7,	7,	6,	3,	'2022-12-07',	17,	27,	17),
-(59,	'completed',	2022,	59,	'2022-12-10',	'19:00:00',	'round_8',	'Winner:51 v. Winner:52',	0,	4,	11,	0,	0,	'2022-12-08',	5,	13,	13),
-(60,	'completed',	2022,	60,	'2022-12-10',	'15:00:00',	'round_8',	'Winner:55 v. Winner:56',	0,	4,	8,	0,	0,	'2022-12-08',	21,	28,	28),
-(61,	'completed',	2022,	61,	'2022-12-13',	'19:00:00',	'round_4',	'Winner:57 v. Winner:58',	0,	1,	2,	0,	0,	'2022-12-11',	8,	17,	17),
-(62,	'completed',	2022,	62,	'2022-12-14',	'19:00:00',	'round_4',	'Winner:59 v. Winner:60',	0,	3,	4,	0,	0,	'2022-12-12',	13,	28,	28),
-(63,	'open',	2022,	63,	'2022-12-17',	'16:00:00',	'third_place',	'Looser:61 v. Looser:62',	0,	0,	0,	0,	0,	'2022-12-15',	8,	13,	NULL),
-(64,	'open',	2022,	64,	'2022-12-18',	'15:00:00',	'final',	'Winner:61 v. Winner:62',	0,	0,	0,	0,	0,	'2022-12-16',	17,	28,	NULL);
+INSERT INTO `match` (`id`, `internalId`, `status`, `year`, `number`, `date`, `time`, `round`, `match`, `penalty`, `countryAGoals`, `countryBGoals`, `countryAPenaltyGoals`, `countryBPenaltyGoals`, `toConfigureOn`, `countryAId`, `countryBId`, `winnerId`) VALUES
+(1,	'',	'open',	2022,	1,	'2023-01-20',	'16:00:00',	'group',	'A1 v. A2',	0,	1,	11,	0,	0,	NULL,	1,	2,	2),
+(2,	'',	'open',	2022,	2,	'2023-01-20',	'16:00:00',	'group',	'A3 v. A4',	0,	2,	6,	0,	0,	NULL,	3,	4,	4),
+(3,	'',	'completed',	2022,	3,	'2022-11-21',	'13:00:00',	'group',	'B1 v. B2',	0,	11,	10,	0,	0,	NULL,	5,	6,	5),
+(4,	'',	'completed',	2022,	4,	'2022-11-21',	'19:00:00',	'group',	'B3 v. B4',	0,	8,	8,	0,	0,	NULL,	7,	8,	NULL),
+(5,	'',	'completed',	2022,	5,	'2022-11-22',	'19:00:00',	'group',	'D1 v. D4',	0,	12,	8,	0,	0,	NULL,	13,	16,	13),
+(6,	'',	'completed',	2022,	6,	'2022-11-22',	'13:00:00',	'group',	'D2 v. D3',	0,	7,	10,	0,	0,	NULL,	14,	15,	15),
+(7,	'',	'completed',	2022,	7,	'2022-11-22',	'16:00:00',	'group',	'C3 v. C4',	0,	8,	4,	0,	0,	NULL,	11,	12,	11),
+(8,	'',	'completed',	2022,	8,	'2022-11-22',	'10:00:00',	'group',	'C1 v. C2',	0,	7,	10,	0,	0,	NULL,	9,	10,	10),
+(9,	'',	'completed',	2022,	9,	'2022-11-23',	'19:00:00',	'group',	'F1 v. F2',	0,	6,	5,	0,	0,	NULL,	21,	22,	21),
+(10,	'',	'completed',	2022,	10,	'2022-11-23',	'16:00:00',	'group',	'E1 v. E4',	0,	12,	9,	0,	0,	NULL,	17,	20,	17),
+(11,	'',	'completed',	2022,	11,	'2022-11-23',	'13:00:00',	'group',	'E2 v. E3',	0,	9,	1,	0,	0,	NULL,	18,	19,	18),
+(12,	'',	'completed',	2022,	12,	'2022-11-23',	'10:00:00',	'group',	'F3 v. F4',	0,	2,	6,	0,	0,	NULL,	23,	24,	24),
+(13,	'',	'completed',	2022,	13,	'2022-11-24',	'10:00:00',	'group',	'G3 v. G4',	0,	12,	7,	0,	0,	NULL,	27,	28,	27),
+(14,	'',	'completed',	2022,	14,	'2022-11-24',	'13:00:00',	'group',	'H3 v. H4',	0,	4,	11,	0,	0,	NULL,	31,	32,	32),
+(15,	'',	'completed',	2022,	15,	'2022-11-24',	'16:00:00',	'group',	'H1 v. H2',	0,	1,	5,	0,	0,	NULL,	29,	30,	30),
+(16,	'',	'completed',	2022,	16,	'2022-11-24',	'19:00:00',	'group',	'G1 v. G2',	0,	4,	10,	0,	0,	NULL,	25,	26,	26),
+(17,	'',	'completed',	2022,	17,	'2022-11-25',	'10:00:00',	'group',	'B4 v. B2',	0,	11,	4,	0,	0,	NULL,	8,	6,	8),
+(18,	'',	'completed',	2022,	18,	'2022-11-25',	'13:00:00',	'group',	'A1 v. A3',	0,	2,	10,	0,	0,	NULL,	1,	3,	3),
+(19,	'',	'completed',	2022,	19,	'2022-11-25',	'16:00:00',	'group',	'A4 v. A2',	0,	1,	4,	0,	0,	NULL,	4,	2,	2),
+(20,	'',	'completed',	2022,	20,	'2022-11-25',	'19:00:00',	'group',	'B1 v. B3',	0,	7,	5,	0,	0,	NULL,	5,	7,	5),
+(21,	'',	'completed',	2022,	21,	'2022-11-26',	'10:00:00',	'group',	'D3 v. D4',	0,	7,	3,	0,	0,	NULL,	15,	16,	15),
+(22,	'',	'completed',	2022,	22,	'2022-11-26',	'13:00:00',	'group',	'C4 v. C2',	0,	2,	6,	0,	0,	NULL,	12,	10,	10),
+(23,	'',	'completed',	2022,	23,	'2022-11-26',	'16:00:00',	'group',	'D1 v. D2',	0,	9,	4,	0,	0,	NULL,	13,	14,	13),
+(24,	'',	'completed',	2022,	24,	'2022-11-26',	'19:00:00',	'group',	'C1 v. C3',	0,	12,	8,	0,	0,	NULL,	9,	11,	9),
+(25,	'',	'completed',	2022,	25,	'2022-11-27',	'10:00:00',	'group',	'E3 v. E4',	0,	8,	11,	0,	0,	NULL,	19,	20,	20),
+(26,	'',	'completed',	2022,	26,	'2022-11-27',	'13:00:00',	'group',	'F1 v. F3',	0,	2,	7,	0,	0,	NULL,	21,	23,	23),
+(27,	'',	'completed',	2022,	27,	'2022-11-27',	'16:00:00',	'group',	'F4 v. F2',	0,	2,	8,	0,	0,	NULL,	24,	22,	22),
+(28,	'',	'completed',	2022,	28,	'2022-11-27',	'19:00:00',	'group',	'E1 v. E2',	0,	7,	3,	0,	0,	NULL,	17,	18,	17),
+(29,	'',	'completed',	2022,	29,	'2022-11-28',	'10:00:00',	'group',	'G4 v. G2',	0,	12,	1,	0,	0,	NULL,	28,	26,	28),
+(30,	'',	'completed',	2022,	30,	'2022-11-28',	'13:00:00',	'group',	'H4 v. H2',	0,	9,	10,	0,	0,	NULL,	32,	30,	30),
+(31,	'',	'completed',	2022,	31,	'2022-11-28',	'16:00:00',	'group',	'G1 v. G3',	0,	2,	6,	0,	0,	NULL,	25,	27,	27),
+(32,	'',	'completed',	2022,	32,	'2022-11-28',	'19:00:00',	'group',	'H1 v. H3',	0,	8,	1,	0,	0,	NULL,	29,	31,	29),
+(33,	'',	'completed',	2022,	33,	'2022-11-29',	'19:00:00',	'group',	'B4 v. B1',	0,	1,	1,	0,	0,	NULL,	8,	5,	NULL),
+(34,	'',	'completed',	2022,	34,	'2022-11-29',	'19:00:00',	'group',	'B2 v. B3',	0,	12,	1,	0,	0,	NULL,	6,	7,	6),
+(35,	'',	'completed',	2022,	35,	'2022-11-29',	'15:00:00',	'group',	'A2 v. A3',	0,	12,	2,	0,	0,	NULL,	2,	3,	2),
+(36,	'',	'completed',	2022,	36,	'2022-11-29',	'15:00:00',	'group',	'A4 v. A1',	0,	9,	7,	0,	0,	NULL,	4,	1,	4),
+(37,	'',	'completed',	2022,	37,	'2022-11-30',	'15:00:00',	'group',	'D4 v. D2',	0,	8,	8,	0,	0,	NULL,	16,	14,	NULL),
+(38,	'',	'completed',	2022,	38,	'2022-11-30',	'15:00:00',	'group',	'D3 v. D1',	0,	3,	9,	0,	0,	NULL,	15,	13,	13),
+(39,	'',	'completed',	2022,	39,	'2022-11-30',	'19:00:00',	'group',	'C4 v. C1',	0,	11,	10,	0,	0,	NULL,	12,	9,	12),
+(40,	'',	'completed',	2022,	40,	'2022-11-30',	'19:00:00',	'group',	'C2 v. C3',	0,	7,	4,	0,	0,	NULL,	10,	11,	10),
+(41,	'',	'completed',	2022,	41,	'2022-12-01',	'15:00:00',	'group',	'F4 v. F1',	0,	7,	10,	0,	0,	NULL,	24,	21,	21),
+(42,	'',	'completed',	2022,	42,	'2022-12-01',	'15:00:00',	'group',	'F2 v. F3',	0,	10,	11,	0,	0,	NULL,	22,	23,	23),
+(43,	'',	'completed',	2022,	43,	'2022-12-01',	'19:00:00',	'group',	'E3 v. E1',	0,	1,	8,	0,	0,	NULL,	19,	17,	17),
+(44,	'',	'completed',	2022,	44,	'2022-12-01',	'19:00:00',	'group',	'E4 v. E2',	0,	3,	4,	0,	0,	NULL,	20,	18,	18),
+(45,	'',	'completed',	2022,	45,	'2022-12-02',	'15:00:00',	'group',	'H2 v. H3',	0,	6,	8,	0,	0,	NULL,	30,	31,	31),
+(46,	'',	'completed',	2022,	46,	'2022-12-02',	'15:00:00',	'group',	'H4 v. H1',	0,	8,	6,	0,	0,	NULL,	32,	29,	32),
+(47,	'',	'completed',	2022,	47,	'2022-12-02',	'19:00:00',	'group',	'G2 v. G3',	0,	1,	4,	0,	0,	NULL,	26,	27,	27),
+(48,	'',	'completed',	2022,	48,	'2022-12-02',	'19:00:00',	'group',	'G4 v. G1',	0,	4,	4,	0,	0,	NULL,	28,	25,	NULL),
+(49,	'',	'completed',	2022,	49,	'2022-12-03',	'15:00:00',	'round_16',	'Winner:A v. Runner-up:B',	0,	4,	9,	0,	0,	'2022-12-01',	2,	8,	8),
+(50,	'',	'completed',	2022,	50,	'2022-12-03',	'19:00:00',	'round_16',	'Winner:C v. Runner-up:D',	0,	6,	9,	0,	0,	'2022-12-01',	10,	15,	15),
+(51,	'',	'completed',	2022,	51,	'2022-12-04',	'19:00:00',	'round_16',	'Winner:B v. Runner-up:A',	0,	12,	3,	0,	0,	'2022-12-02',	5,	4,	5),
+(52,	'',	'completed',	2022,	52,	'2022-12-04',	'15:00:00',	'round_16',	'Winner:D v. Runner-up:C',	0,	9,	3,	0,	0,	'2022-12-02',	13,	9,	13),
+(53,	'',	'completed',	2022,	53,	'2022-12-05',	'15:00:00',	'round_16',	'Winner:E v. Runner-up:F',	0,	10,	2,	0,	0,	'2022-12-03',	17,	23,	17),
+(54,	'',	'completed',	2022,	54,	'2022-12-05',	'19:00:00',	'round_16',	'Winner:G v. Runner-up:H',	0,	9,	4,	0,	0,	'2022-12-03',	27,	32,	27),
+(55,	'',	'completed',	2022,	55,	'2022-12-06',	'15:00:00',	'round_16',	'Winner:F v. Runner-up:E',	1,	7,	7,	6,	2,	'2022-12-04',	21,	18,	21),
+(56,	'',	'completed',	2022,	56,	'2022-12-06',	'19:00:00',	'round_16',	'Winner:H v. Runner-up:G',	0,	3,	4,	0,	0,	'2022-12-04',	30,	28,	28),
+(57,	'',	'completed',	2022,	57,	'2022-12-09',	'19:00:00',	'round_8',	'Winner:49 v. Winner:50',	0,	7,	1,	0,	0,	'2022-12-07',	8,	15,	8),
+(58,	'',	'completed',	2022,	58,	'2022-12-09',	'15:00:00',	'round_8',	'Winner:53 v. Winner:54',	1,	7,	7,	6,	3,	'2022-12-07',	17,	27,	17),
+(59,	'',	'completed',	2022,	59,	'2022-12-10',	'19:00:00',	'round_8',	'Winner:51 v. Winner:52',	0,	4,	11,	0,	0,	'2022-12-08',	5,	13,	13),
+(60,	'',	'completed',	2022,	60,	'2022-12-10',	'15:00:00',	'round_8',	'Winner:55 v. Winner:56',	0,	4,	8,	0,	0,	'2022-12-08',	21,	28,	28),
+(61,	'',	'completed',	2022,	61,	'2022-12-13',	'19:00:00',	'round_4',	'Winner:57 v. Winner:58',	0,	1,	2,	0,	0,	'2022-12-11',	8,	17,	17),
+(62,	'',	'completed',	2022,	62,	'2022-12-14',	'19:00:00',	'round_4',	'Winner:59 v. Winner:60',	0,	3,	4,	0,	0,	'2022-12-12',	13,	28,	28),
+(63,	'',	'open',	2022,	63,	'2022-12-17',	'16:00:00',	'third_place',	'Looser:61 v. Looser:62',	0,	0,	0,	0,	0,	'2022-12-15',	8,	13,	NULL),
+(64,	'',	'open',	2022,	64,	'2022-12-18',	'15:00:00',	'final',	'Winner:61 v. Winner:62',	0,	0,	0,	0,	0,	'2022-12-16',	17,	28,	NULL);
+
+DROP TABLE IF EXISTS `push_subscription`;
+CREATE TABLE `push_subscription` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `internalId` varchar(36) NOT NULL,
+  `userId` bigint(20) unsigned NOT NULL,
+  `subscription` text NOT NULL,
+  `createdAt` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `updatedAt` datetime(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
+  `deletedAt` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userId` (`userId`),
+  CONSTRAINT `push_subscription_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `push_subscription` (`id`, `internalId`, `userId`, `subscription`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
+(14,	'772216c4-aa7d-48b0-943c-33019fbf8646',	2,	'token goes here',	'2023-01-03 12:34:32.000000',	'2023-01-06 01:48:56.000000',	NULL),
+(16,	'0606120c-b68c-4c18-8adb-035b982234df',	1,	'endpoint string',	'2023-01-06 01:27:19.000000',	'2023-01-06 01:27:19.088153',	NULL);
 
 DROP VIEW IF EXISTS `scoreboard`;
-CREATE TABLE `scoreboard` (`userId` int(11), `totalPoints` decimal(32,0), `position` bigint(21), `year` int(11), `totalTips` bigint(21));
+CREATE TABLE `scoreboard` (`userId` bigint(20) unsigned, `totalPoints` decimal(32,0), `position` bigint(21), `year` int(11), `totalTips` bigint(21));
 
 
 DROP TABLE IF EXISTS `tip`;
 CREATE TABLE `tip` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `year` int(11) NOT NULL,
   `isLevel` tinyint(4) NOT NULL DEFAULT 0,
   `toPenalty` tinyint(4) NOT NULL DEFAULT 0,
@@ -198,17 +220,17 @@ CREATE TABLE `tip` (
   `entryByBot` tinyint(4) NOT NULL DEFAULT 0,
   `points` int(11) NOT NULL DEFAULT 0,
   `deletedAt` datetime(6) DEFAULT NULL,
-  `userId` int(11) NOT NULL,
-  `matchId` int(11) NOT NULL,
-  `toWinId` int(11) DEFAULT NULL,
+  `userId` bigint(20) unsigned NOT NULL,
+  `matchId` bigint(20) unsigned NOT NULL,
+  `toWinId` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_9f619491671d8b1e48d521d4cc1` (`userId`),
   KEY `FK_ea7e565d0ae00b8bc34b43a4cfc` (`matchId`),
   KEY `FK_6cad4b0d2a7dd0e5e9e119ad591` (`toWinId`),
-  CONSTRAINT `FK_6cad4b0d2a7dd0e5e9e119ad591` FOREIGN KEY (`toWinId`) REFERENCES `country` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_9f619491671d8b1e48d521d4cc1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_ea7e565d0ae00b8bc34b43a4cfc` FOREIGN KEY (`matchId`) REFERENCES `match` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `tip_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
+  CONSTRAINT `tip_ibfk_2` FOREIGN KEY (`matchId`) REFERENCES `match` (`id`),
+  CONSTRAINT `tip_ibfk_3` FOREIGN KEY (`toWinId`) REFERENCES `country` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `tip` (`id`, `year`, `isLevel`, `toPenalty`, `countryAToScore`, `countryBToScore`, `countryAPenaltyToScore`, `countryBPenaltyToScore`, `entryByBot`, `points`, `deletedAt`, `userId`, `matchId`, `toWinId`) VALUES
 (1,	2022,	0,	0,	7,	11,	0,	0,	0,	12,	NULL,	1,	1,	2),
@@ -12280,14 +12302,14 @@ CREATE TABLE `typeorm_metadata` (
   `table` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `value` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `typeorm_metadata` (`type`, `database`, `schema`, `table`, `name`, `value`) VALUES
 ('VIEW',	NULL,	'worldcup',	NULL,	'scoreboard',	'select userId, sum(points) as totalPoints, rank() over (order by totalPoints desc) as position, year, count(userId) as totalTips from tip \n where year = 2022 group by userId');
 
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `internalId` varchar(36) NOT NULL,
   `role` enum('user','admin') NOT NULL DEFAULT 'user',
   `type` enum('human','bot') NOT NULL DEFAULT 'human',
@@ -12301,10 +12323,10 @@ CREATE TABLE `user` (
   `deletedAt` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `IDX_e12875dfb3b1d92d7d7c5377e2` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `user` (`id`, `internalId`, `role`, `type`, `username`, `email`, `password`, `token`, `data`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
-(1,	'aec003bb-cb85-477c-9a22-f05836614e92',	'admin',	'human',	'admin',	'admin@example.com',	'$2b$10$j2cVOsPWDjldXmmdVq0Vv.CXdg/FX/G5Dj3orhDHaG6Pc7zgmcByC',	'd834cb7c2e1fcaa541f8147a9b7ca11e1559c217b3ddbfdf59fc202fe6c53dc1',	NULL,	'2022-12-10 13:25:18.647039',	'2022-12-10 13:25:18.647039',	NULL),
+(1,	'aec003bb-cb85-477c-9a22-f05836614e92',	'admin',	'human',	'admin',	'admin@example.com',	'$2b$10$j2cVOsPWDjldXmmdVq0Vv.CXdg/FX/G5Dj3orhDHaG6Pc7zgmcByC',	'd834cb7c2e1fcaa541f8147a9b7ca11e1559c217b3ddbfdf59fc202fe6c53dc1',	NULL,	'2022-12-10 13:25:18.647039',	'2023-01-03 04:27:54.000000',	NULL),
 (2,	'3e62f681-a365-4988-b4d9-03009140b191',	'user',	'human',	'0demo_user',	'0demo_user@example.com',	'$2b$10$NYyAyEtF8ai0JInJ28zrt.W5n29LuVA3gAxtfC0HMnSxzxRJ0i4dm',	'3f326ccd4b1393c4274dc4f183c48e11b9be7b3e23c37cc16b904cf31b6266b6',	NULL,	'2022-12-10 13:25:31.566903',	'2022-12-10 13:25:31.566903',	NULL),
 (3,	'47ef553c-4efa-4f57-bebf-de4f2c6182c1',	'user',	'human',	'1demo_user',	'1demo_user@example.com',	'$2b$10$8Elczsh2fRF9dOvy2h8spOsjWt9GzJYLzGIDmQYnd9QKOczxcbnnm',	'abdb12c3b2ac1553901737493b8aeab875286081db17cb940cb6e36f10647943',	NULL,	'2022-12-10 13:25:31.801349',	'2022-12-10 13:25:31.801349',	NULL),
 (4,	'53cd0ba0-c0ab-4dbd-8d3d-53d133cf9597',	'user',	'human',	'2demo_user',	'2demo_user@example.com',	'$2b$10$rlxlFgLZtlEPPnolqh2IAeWU67MyLd3Wf7Yxn4sAQFi06c.bFRw52',	'746bc2d076c026ae87076da9428e017a0dd4a7b633aa6e89d6d7a0bfbb0023d3',	NULL,	'2022-12-10 13:25:31.974527',	'2022-12-10 13:25:31.974527',	NULL),
@@ -12504,22 +12526,34 @@ INSERT INTO `user` (`id`, `internalId`, `role`, `type`, `username`, `email`, `pa
 (198,	'4714f5c2-66f5-4a7c-a995-4a4b3bfb6177',	'user',	'human',	'196demo_user',	'196demo_user@example.com',	'$2b$10$K1OZnhDr58GgpW19iut34OcQZLuXchFDRpI.HyyGHFPoTDL5F7ywG',	'6570a0341edf0168d0a40854b33ce7f6e6eae9e73b750ec993c21528ede23825',	NULL,	'2022-12-10 13:25:57.223958',	'2022-12-10 13:25:57.223958',	NULL),
 (199,	'cf9c9709-6724-4638-ad0a-ec08053c380e',	'user',	'human',	'197demo_user',	'197demo_user@example.com',	'$2b$10$w6kfJLQZH91KHuNUKQRVW.PJ5e65iu7aDn37DbSN26G8ZgbxoQ0gu',	'0496ed39c11007c7dad2881a4da3cf204722f77aeb156a6af15775cf83132366',	NULL,	'2022-12-10 13:25:57.351546',	'2022-12-10 13:25:57.351546',	NULL),
 (200,	'71c85da4-5ae3-4ec3-80f7-f8049aa35795',	'user',	'human',	'198demo_user',	'198demo_user@example.com',	'$2b$10$baFz32BGekvHiSuYpM4pw.KNIp5e7lLibzyaWdvB91/EB6OYp.yBW',	'6849eb30c02aeab54507293fc1c9208c5fdddf341cbfb77a810f657d9e0c491a',	NULL,	'2022-12-10 13:25:57.480094',	'2022-12-10 13:25:57.480094',	NULL),
-(201,	'df79a539-3816-4935-a47b-46224ee69b9f',	'user',	'human',	'199demo_user',	'199demo_user@example.com',	'$2b$10$HNPvlb2HnKGQaNp.l0MzVuwVVHiRmTjP7xxogdWV6fGBEjjCGRZ/K',	'2e7f4996f45f568eec4e429b05b912e70fcc65fead8fb343bd267d525f319015',	NULL,	'2022-12-10 13:25:57.608424',	'2022-12-10 13:25:57.608424',	NULL);
+(201,	'df79a539-3816-4935-a47b-46224ee69b9f',	'user',	'human',	'199demo_user',	'199demo_user@example.com',	'$2b$10$HNPvlb2HnKGQaNp.l0MzVuwVVHiRmTjP7xxogdWV6fGBEjjCGRZ/K',	'2e7f4996f45f568eec4e429b05b912e70fcc65fead8fb343bd267d525f319015',	NULL,	'2022-12-10 13:25:57.608424',	'2022-12-30 13:33:27.000000',	NULL),
+(205,	'87ba3408-ee64-4aff-8866-4e36b236ab5b',	'user',	'human',	'happy_feet',	'happy@feetcom',	'$2b$12$OT0nFkSysHyn6KZr27BI5ucAql3G/2U1jhA.DNAQqKIv5AHU6AR9.',	'ed1b191ee41e5439479741ef24bf2c0e289bf4d91fadb957fbc33aec69b9182',	NULL,	'2023-01-06 01:19:21.000000',	'2023-01-06 01:19:21.612935',	NULL),
+(206,	'af242dac-d982-4dd2-9250-ecd50d77a8af',	'user',	'human',	'luckyday',	'luckday@example.com',	'$2b$12$Rxv7VGTqhoykynlEXieUDeFY7CpdrFtK43SGSAteM43YjC7ImfoR2',	'7c1e34941150173f2e33dc63b44cea294b1fdeac65e07f76b8e47e8e18ec',	NULL,	'2023-01-06 02:22:30.000000',	'2023-01-06 02:25:31.000000',	NULL);
 
 DROP TABLE IF EXISTS `user_chat_room`;
 CREATE TABLE `user_chat_room` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `userId` int(11) NOT NULL,
-  `roomId` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `userId` bigint(20) unsigned NOT NULL,
+  `roomId` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_401e21895e3d5f4046956cc8106` (`userId`),
   KEY `FK_912dc634a07f73d79c18182bf15` (`roomId`),
-  CONSTRAINT `FK_401e21895e3d5f4046956cc8106` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_912dc634a07f73d79c18182bf15` FOREIGN KEY (`roomId`) REFERENCES `chat_room` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `user_chat_room_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
+  CONSTRAINT `user_chat_room_ibfk_2` FOREIGN KEY (`roomId`) REFERENCES `chat_room` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
+DROP TABLE IF EXISTS `__diesel_schema_migrations`;
+CREATE TABLE `__diesel_schema_migrations` (
+  `version` varchar(50) NOT NULL,
+  `run_on` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `__diesel_schema_migrations` (`version`, `run_on`) VALUES
+('20221214074328',	'2022-12-14 07:46:23');
 
 DROP TABLE IF EXISTS `scoreboard`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `scoreboard` AS select `tip`.`userId` AS `userId`,sum(`tip`.`points`) AS `totalPoints`,rank() over ( order by sum(`tip`.`points`) desc) AS `position`,`tip`.`year` AS `year`,count(`tip`.`userId`) AS `totalTips` from `tip` where `tip`.`year` = 2022 group by `tip`.`userId`;
 
--- 2022-12-23 00:49:17
+-- 2023-01-12 07:46:15
