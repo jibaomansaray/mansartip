@@ -4,6 +4,7 @@ mod country_system;
 mod general;
 mod match_system;
 mod public_routes;
+mod tipping_system;
 mod user_system;
 
 #[actix_web::main]
