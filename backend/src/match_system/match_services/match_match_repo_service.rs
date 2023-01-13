@@ -92,7 +92,7 @@ impl MatchRepoServiceTrait for MatchRepoService {
             result.push(entity);
         }
 
-        Some(result)
+        result
     }
 
     async fn all(&self, year: i32) -> Vec<MatchEntity> {
