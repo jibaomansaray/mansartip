@@ -7,7 +7,7 @@ use crate::{
 use chrono::{DateTime, Utc};
 use sqlx::Row;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CountryEntity {
     pub id: u64,
     pub internal_id: String,
