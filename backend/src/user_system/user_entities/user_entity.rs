@@ -35,8 +35,26 @@ impl From<UserRole> for u64 {
     }
 }
 
+impl From<&UserRole> for u64 {
+    fn from(role: &UserRole) -> u64 {
+        match role {
+            UserRole::User => 1,
+            UserRole::Admin => 2,
+        }
+    }
+}
+
 impl From<UserType> for u64 {
     fn from(user_type: UserType) -> u64 {
+        match user_type {
+            UserType::Human => 1,
+            UserType::Bot => 2,
+        }
+    }
+}
+
+impl From<&UserType> for u64 {
+    fn from(user_type: &UserType) -> u64 {
         match user_type {
             UserType::Human => 1,
             UserType::Bot => 2,
