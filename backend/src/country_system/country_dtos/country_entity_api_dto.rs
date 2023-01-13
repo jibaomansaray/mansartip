@@ -5,8 +5,6 @@ use crate::country_system::country_entities::CountryEntity;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CountryEntityApiDto {
-    #[serde(skip)]
-    id: u64,
     internal_id: String,
     name: String,
     year: i16,
@@ -20,7 +18,6 @@ pub struct CountryEntityApiDto {
 impl From<CountryEntity> for CountryEntityApiDto {
     fn from(entity: CountryEntity) -> Self {
         Self {
-            id: entity.id,
             internal_id: entity.internal_id,
             name: entity.name,
             year: entity.year,
