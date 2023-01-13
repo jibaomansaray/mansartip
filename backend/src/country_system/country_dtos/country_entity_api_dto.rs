@@ -14,6 +14,7 @@ pub struct CountryEntityApiDto {
     group_points: u8,
     image: String,
     deleted_at: Option<DateTime<Utc>>,
+    image_source: String,
 }
 
 impl From<CountryEntity> for CountryEntityApiDto {
@@ -25,8 +26,9 @@ impl From<CountryEntity> for CountryEntityApiDto {
             year: entity.year,
             short: entity.short,
             group_points: entity.group_points,
-            image: entity.image,
+            image: entity.image.clone(),
             deleted_at: entity.deleted_at,
+            image_source: format!("/static/flag/{}", entity.image),
         }
     }
 }
