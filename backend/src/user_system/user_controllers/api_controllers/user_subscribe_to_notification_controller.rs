@@ -2,11 +2,11 @@ use actix_web::{post, web, Responder, Result};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    app::app_helpers::authenticated_user::AuthenticatedUser,
-    user_system::{
-        user_dtos::push_subscription_api_response_dto::PushSubscriptionResponseDto,
-        user_services::push_subscription_service::PushSubscriptionService,
+    app::{
+        app_dtos::api_response_dto::ApiResponseDto,
+        app_helpers::authenticated_user::AuthenticatedUser,
     },
+    user_system::user_services::push_subscription_service::PushSubscriptionService,
 };
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -24,8 +24,8 @@ pub(crate) async fn handler(
         .subscribe(&payload.subscription, auth_user.id)
         .await
     {
-        Ok(entity) => Ok(web::Json(PushSubscriptionResponseDto::new(entity))),
-        Err(e) => Ok(web::Json(PushSubscriptionResponseDto::new_not_found(
+        Ok(entity) => Ok(web::Json(ApiResponseDto::new(entity))),
+        Err(e) => Ok(web::Json(ApiResponseDto::new_not_found(
             Some(&e.message),
             Some(&e.code),
         ))),

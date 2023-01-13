@@ -3,10 +3,10 @@ use actix_web::{cookie::Cookie, post, web, HttpResponse, Responder, Result};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    app::app_state::AppState,
+    app::{app_dtos::api_response_dto::ApiResponseDto, app_state::AppState},
     user_system::{
-        user_dtos::user_entity_api_response_dto::UserEntityApiResponseDto,
-        user_entities::UserEntity, user_services::user_service::UserService,
+        user_dtos::user_auth_entity_dto::UserAuthEntityDto,
+        user_services::user_service::UserService,
     },
 };
 
@@ -34,14 +34,17 @@ pub(crate) async fn handler(
             .path("/")
             .finish();
 
-        let response = HttpResponse::Ok().cookie(cookie).json(web::Json(
-            UserEntityApiResponseDto::new_auth_entity(auth_user, Some(&app_data.vapid_public_key)),
-        ));
+        let response = HttpResponse::Ok()
+            .cookie(cookie)
+            .json(web::Json(ApiResponseDto::new(UserAuthEntityDto::new(
+                auth_user,
+                &app_data.vapid_public_key,
+            ))));
 
         Ok(response)
     } else {
         let response = HttpResponse::Ok().json(web::Json(
-            UserEntityApiResponseDto::<UserEntity>::new_not_found(
+            ApiResponseDto::<UserAuthEntityDto>::new_not_found(
                 Some("posted data is incorrect"),
                 Some("posted_data_incorrect"),
             ),
