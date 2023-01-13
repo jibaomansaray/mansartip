@@ -3,7 +3,12 @@ use serde::{Deserialize, Serialize};
 use sqlx::Row;
 use uuid::Uuid;
 
-use crate::app::{app_state::DbRow, app_helpers::database_datetime_helper::{created_at_field_value, updated_at_field_value, deleted_at_field_value}};
+use crate::app::{
+    app_helpers::database_datetime_helper::{
+        created_at_field_value, deleted_at_field_value, updated_at_field_value,
+    },
+    app_state::DbRow,
+};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PushSubscriptionEntity {
@@ -32,15 +37,15 @@ impl From<DbRow> for PushSubscriptionEntity {
 }
 
 impl PushSubscriptionEntity {
-  pub fn new(user_id: u64, subscription: &str) -> Self {
-      Self {
-        id: 0,
-        internal_id: Uuid::new_v4().to_string(),
-        user_id,
-        subscription: subscription.to_string(),
-        created_at: None,
-        updated_at: None,
-        deleted_at: None
-      }
-  }
+    pub fn new(user_id: u64, subscription: &str) -> Self {
+        Self {
+            id: 0,
+            internal_id: Uuid::new_v4().to_string(),
+            user_id,
+            subscription: subscription.to_string(),
+            created_at: None,
+            updated_at: None,
+            deleted_at: None,
+        }
+    }
 }

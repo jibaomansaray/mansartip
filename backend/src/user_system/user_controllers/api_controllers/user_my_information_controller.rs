@@ -8,5 +8,7 @@ use crate::{
 /// Returns the current authenticated user's information
 #[get("user/my-info")]
 pub(crate) async fn handler(auth_user: AuthenticatedUser) -> Result<impl Responder> {
-    Ok(web::Json(UserEntityApiResponseDto::new(auth_user.into_inner())))
+    Ok(web::Json(UserEntityApiResponseDto::new(
+        auth_user.into_inner(),
+    )))
 }

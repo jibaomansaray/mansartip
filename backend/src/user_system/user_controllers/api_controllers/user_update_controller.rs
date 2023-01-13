@@ -1,7 +1,10 @@
 use crate::{
     app::app_helpers::authenticated_user::AuthenticatedUser,
     user_system::{
-        user_dtos::{user_entity_api_response_dto::UserEntityApiResponseDto, user_entity_update_api_dto::UserEntityUpdateApiDto},
+        user_dtos::{
+            user_entity_api_response_dto::UserEntityApiResponseDto,
+            user_entity_update_api_dto::UserEntityUpdateApiDto,
+        },
         user_services::user_service::UserService,
     },
 };

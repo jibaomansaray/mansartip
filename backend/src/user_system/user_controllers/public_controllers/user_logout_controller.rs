@@ -1,4 +1,4 @@
-use actix_web::{get, web, Responder, Result, HttpResponse};
+use actix_web::{get, web, HttpResponse, Responder, Result};
 use cookie::Cookie;
 use serde::{Deserialize, Serialize};
 

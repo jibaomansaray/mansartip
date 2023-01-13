@@ -9,7 +9,6 @@ pub struct CreateUserFailedError {
     pub message: String,
 }
 
-
 impl CreateUserFailedError {
     pub fn new(message: &str) -> Self {
         Self {
@@ -30,8 +29,8 @@ impl Default for CreateUserFailedError {
 
 impl fmt::Display for CreateUserFailedError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let message = serde_json::to_string(&self)
-            .unwrap_or_else(|_| String::from("could not create user"));
+        let message =
+            serde_json::to_string(&self).unwrap_or_else(|_| String::from("could not create user"));
         write!(f, "{message}")
     }
 }

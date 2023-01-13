@@ -155,9 +155,10 @@ VALUES (?, ?, ?, ?, ?, ?, ?, NULL, now());";
             .await;
 
         match count {
-            Ok(_) => self.find_user_by_email(&user.email).await.ok_or_else(|| {
-                CreateUserFailedError::new("could not find the created user")
-            }),
+            Ok(_) => self
+                .find_user_by_email(&user.email)
+                .await
+                .ok_or_else(|| CreateUserFailedError::new("could not find the created user")),
             Err(e) => {
                 dbg!("error creating user: {:?}", &e);
                 let error = CreateUserFailedError::new(&e.to_string());

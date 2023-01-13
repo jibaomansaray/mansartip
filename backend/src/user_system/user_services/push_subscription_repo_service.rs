@@ -15,12 +15,19 @@ use crate::{
 pub trait PushSubscriptionRepoServiceTrait {
     async fn find_all_by_user(&self, user: &UserEntity) -> Option<Vec<PushSubscriptionEntity>>;
     async fn find_push_subscription_by_id(&self, id: u64) -> Option<PushSubscriptionEntity>;
-    async fn find_one_by_internal_id_and_user(&self, internal_id: &str, user: &UserEntity) -> Option<PushSubscriptionEntity>;
+    async fn find_one_by_internal_id_and_user(
+        &self,
+        internal_id: &str,
+        user: &UserEntity,
+    ) -> Option<PushSubscriptionEntity>;
     async fn insert_push_subscription(
         &self,
         subscription: PushSubscriptionEntity,
     ) -> Result<PushSubscriptionEntity, AppError>;
-    async fn delete_push_subscription(&self, entity: &PushSubscriptionEntity) -> Result<bool, AppError>;
+    async fn delete_push_subscription(
+        &self,
+        entity: &PushSubscriptionEntity,
+    ) -> Result<bool, AppError>;
 }
 
 pub struct PushSubscriptionRepoService {
@@ -49,7 +56,7 @@ impl PushSubscriptionRepoServiceTrait for PushSubscriptionRepoService {
                 if let Some(e) = entity {
                     entities.push(e);
                 }
-            },
+            }
             _ => (),
         }
 
@@ -69,8 +76,11 @@ impl PushSubscriptionRepoServiceTrait for PushSubscriptionRepoService {
         }
     }
 
-
-    async fn find_one_by_internal_id_and_user(&self, internal_id: &str, user: &UserEntity) -> Option<PushSubscriptionEntity> {
+    async fn find_one_by_internal_id_and_user(
+        &self,
+        internal_id: &str,
+        user: &UserEntity,
+    ) -> Option<PushSubscriptionEntity> {
         let sql = "SELECT * FROM push_subscription WHERE `internalId` = ? and `userId` = ? and `deletedAt` IS NULL";
         let mut rows = sqlx::query(sql)
             .bind(internal_id)
@@ -100,10 +110,10 @@ VALUES (?, ?, ?, now())";
             .await;
 
         match count {
-            Ok(result) => {
-                self.find_push_subscription_by_id(result.last_insert_id())
-                    .await.ok_or_else(|| CreatePushSubscriptionFailedError::new(None))
-            }
+            Ok(result) => self
+                .find_push_subscription_by_id(result.last_insert_id())
+                .await
+                .ok_or_else(|| CreatePushSubscriptionFailedError::new(None)),
             Err(e) => {
                 dbg!("error creating push subscripton record: {:?}", &e);
                 let error = CreatePushSubscriptionFailedError::new(Some(&e.to_string()));
@@ -112,13 +122,16 @@ VALUES (?, ?, ?, now())";
         }
     }
 
-    async fn delete_push_subscription(&self, entity: &PushSubscriptionEntity) -> Result<bool, AppError> {
-        let sql = "DElETE from `push_subscription` WHERE `internalId` = ?" ;       
+    async fn delete_push_subscription(
+        &self,
+        entity: &PushSubscriptionEntity,
+    ) -> Result<bool, AppError> {
+        let sql = "DElETE from `push_subscription` WHERE `internalId` = ?";
         let count = sqlx::query(sql)
             .bind(&entity.internal_id)
             .execute(self.pool.as_ref())
             .await;
-        
+
         match count {
             Ok(_) => Ok(true),
             Err(e) => {

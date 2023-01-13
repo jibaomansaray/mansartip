@@ -1,21 +1,22 @@
 use crate::match_system::match_entities::match_entity::MatchEntity;
 
-use super::match_match_repo_service::{MatchRepoServiceTrait, MatchRepoService};
+use super::match_match_repo_service::{MatchRepoService, MatchRepoServiceTrait};
 
 pub struct MatchService<T = MatchRepoService> {
-  repo: T,
+    repo: T,
 }
 
 impl<T> MatchService<T> {
-  pub fn new(repo: T) -> Self {
-     Self {
-      repo
-     }
-  }
+    pub fn new(repo: T) -> Self {
+        Self { repo }
+    }
 }
 
-impl<T> MatchService<T> where T: MatchRepoServiceTrait {
- pub async fn get_today_matches(&self, year: Option<i32>) -> Option<Vec<MatchEntity>> {
-      self.repo.todays(year).await 
- }
+impl<T> MatchService<T>
+where
+    T: MatchRepoServiceTrait,
+{
+    pub async fn get_today_matches(&self, year: Option<i32>) -> Option<Vec<MatchEntity>> {
+        self.repo.todays(year).await
+    }
 }

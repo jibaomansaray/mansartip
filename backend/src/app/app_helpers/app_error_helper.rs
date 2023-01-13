@@ -3,12 +3,12 @@ use std::fmt;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppError {
-  pub code: String,
-  pub message: String,
+    pub code: String,
+    pub message: String,
 }
 
 impl AppError {
-    pub fn new(code: &str,message: &str) -> Self {
+    pub fn new(code: &str, message: &str) -> Self {
         Self {
             code: code.to_owned(),
             message: message.to_owned(),
@@ -23,4 +23,3 @@ impl fmt::Display for AppError {
         write!(f, "{message}")
     }
 }
-

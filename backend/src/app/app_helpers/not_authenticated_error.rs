@@ -2,9 +2,8 @@ use std::fmt;
 
 use actix_web::{
     body::BoxBody,
-    http::header::{self, TryIntoHeaderValue, HeaderValue},
-    web,
-    HttpResponse, ResponseError, HttpResponseBuilder,
+    http::header::{self, HeaderValue, TryIntoHeaderValue},
+    web, HttpResponse, HttpResponseBuilder, ResponseError,
 };
 use serde::{Deserialize, Serialize};
 
@@ -32,8 +31,12 @@ impl ResponseError for NotAuthenticatedError {
     }
 
     fn error_response(&self) -> HttpResponse<BoxBody> {
-        let mut response  = HttpResponse::with_body(self.status_code(), serde_json::to_string(&self).unwrap());
-        response.headers_mut().insert(header::CONTENT_TYPE, HeaderValue::from_static("application/json"));
+        let mut response =
+            HttpResponse::with_body(self.status_code(), serde_json::to_string(&self).unwrap());
+        response.headers_mut().insert(
+            header::CONTENT_TYPE,
+            HeaderValue::from_static("application/json"),
+        );
         response.map_into_boxed_body()
     }
 }

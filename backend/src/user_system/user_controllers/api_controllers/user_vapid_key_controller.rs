@@ -1,5 +1,5 @@
 use actix_web::{get, web, Responder, Result};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::app::app_state::AppState;
 

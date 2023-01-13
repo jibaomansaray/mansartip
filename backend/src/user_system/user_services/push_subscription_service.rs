@@ -1,6 +1,9 @@
 use crate::{
     app::app_helpers::app_error_helper::AppError,
-    user_system::{user_entities::{PushSubscriptionEntity, UserEntity}, user_helpers::create_push_subscription_failed_error::CreatePushSubscriptionFailedError},
+    user_system::{
+        user_entities::{PushSubscriptionEntity, UserEntity},
+        user_helpers::create_push_subscription_failed_error::CreatePushSubscriptionFailedError,
+    },
 };
 
 use super::push_subscription_repo_service::{
@@ -48,18 +51,14 @@ where
         internal_id: &str,
         user: &UserEntity,
     ) -> Result<PushSubscriptionEntity, AppError> {
-        match self
-            .get_by_internal_id(internal_id, user)
-            .await
-        {
-            Some(entity) => {
-             match self.repo.delete_push_subscription(&entity).await {
+        match self.get_by_internal_id(internal_id, user).await {
+            Some(entity) => match self.repo.delete_push_subscription(&entity).await {
                 Ok(_) => Ok(entity),
-                Err(e) => Err(e)
-             }
-
+                Err(e) => Err(e),
             },
-            None => Err(CreatePushSubscriptionFailedError::to_delete_error(Some("push subscription not found"))),
+            None => Err(CreatePushSubscriptionFailedError::to_delete_error(Some(
+                "push subscription not found",
+            ))),
         }
     }
 }

@@ -14,8 +14,14 @@ pub(crate) async fn handler(
     push_service: web::Data<PushSubscriptionService>,
     auth_user: AuthenticatedUser,
 ) -> Result<impl Responder> {
-    match push_service.unsubscribe(internal_id.as_str(), &auth_user).await {
+    match push_service
+        .unsubscribe(internal_id.as_str(), &auth_user)
+        .await
+    {
         Ok(entity) => Ok(web::Json(PushSubscriptionResponseDto::new(entity))),
-        Err(e)=> Ok(web::Json(PushSubscriptionResponseDto::new_not_found(Some(&e.message), Some(&e.code)))),
+        Err(e) => Ok(web::Json(PushSubscriptionResponseDto::new_not_found(
+            Some(&e.message),
+            Some(&e.code),
+        ))),
     }
 }

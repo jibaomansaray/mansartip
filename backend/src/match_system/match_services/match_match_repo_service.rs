@@ -49,7 +49,6 @@ impl MatchRepoServiceTrait for MatchRepoService {
 
         let mut result = Vec::new();
 
-
         let mut rows = sqlx::query(sql.as_str())
             .bind(year.unwrap_or_default())
             .map(|row| {

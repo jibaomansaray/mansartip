@@ -1,7 +1,5 @@
 use crate::country_system::{
-    country_dtos::{
-        country_api_response_dto::CountryApiResponseDto
-    },
+    country_dtos::country_api_response_dto::CountryApiResponseDto,
     country_services::country_service::CountryService,
 };
 use actix_web::{get, web, Responder, Result};

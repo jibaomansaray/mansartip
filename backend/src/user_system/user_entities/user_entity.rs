@@ -1,4 +1,9 @@
-use crate::app::{app_state::DbRow, app_helpers::database_datetime_helper::{updated_at_field_value, created_at_field_value, deleted_at_field_value}};
+use crate::app::{
+    app_helpers::database_datetime_helper::{
+        created_at_field_value, deleted_at_field_value, updated_at_field_value,
+    },
+    app_state::DbRow,
+};
 use chrono::prelude::*;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -104,7 +109,7 @@ impl Default for UserEntity {
             username: "".to_owned(),
             email: "".to_owned(),
             password: "".to_string(),
-            token: Self::generate_token(), 
+            token: Self::generate_token(),
             data: "".to_owned(),
             created_at: None,
             updated_at: None,

@@ -26,7 +26,7 @@ impl From<CountryEntity> for CountryEntityApiDto {
             short: entity.short,
             group_points: entity.group_points,
             image: entity.image,
-            deleted_at: entity.deleted_at
+            deleted_at: entity.deleted_at,
         }
     }
 }

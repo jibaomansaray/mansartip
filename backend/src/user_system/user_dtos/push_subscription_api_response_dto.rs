@@ -21,11 +21,18 @@ impl<T> PushSubscriptionResponseDto<T> {
     }
 
     pub fn new_not_found(message: Option<&str>, code: Option<&str>) -> Self {
-      Self {
-        success: false,
-        push_subscription: None,
-        message: Some(message.unwrap_or_else(|| "push subscription not found").to_owned()),
-        code: Some(code.unwrap_or_else(|| "push_subscription_not_found").to_owned())
-      }
+        Self {
+            success: false,
+            push_subscription: None,
+            message: Some(
+                message
+                    .unwrap_or_else(|| "push subscription not found")
+                    .to_owned(),
+            ),
+            code: Some(
+                code.unwrap_or_else(|| "push_subscription_not_found")
+                    .to_owned(),
+            ),
+        }
     }
 }
