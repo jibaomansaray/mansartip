@@ -6,8 +6,8 @@ use crate::{
     match_system::match_entities::match_entity::{MatchEntity, MatchRound, MatchStatus},
 };
 
-#[derive(Debug, Deserialize, Serialize)]
-pub(crate) struct MatchEntityDto {
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct MatchEntityDto {
     pub internal_id: String,
     pub status: MatchStatus,
     pub round: MatchRound,
