@@ -5,7 +5,7 @@ use std::{
 
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
-    web, Error, HttpMessage, HttpResponse,
+    web, Error, HttpMessage,
 };
 use futures::FutureExt;
 use futures_util::future::LocalBoxFuture;

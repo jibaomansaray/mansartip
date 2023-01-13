@@ -1,8 +1,5 @@
 use crate::user_system::{
-    user_dtos::{
-        user_entity_api_response_dto::UserEntityApiResponseDto,
-        user_entity_update_api_dto::UserEntityUpdateApiDto,
-    },
+    user_dtos::user_entity_update_api_dto::UserEntityUpdateApiDto,
     user_entities::UserEntity,
     user_helpers::{
         create_user_failed_error::CreateUserFailedError,
