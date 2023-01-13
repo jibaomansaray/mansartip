@@ -51,41 +51,17 @@ impl MatchRepoService {
 #[async_trait]
 impl MatchRepoServiceTrait for MatchRepoService {
     async fn todays(&self, year: i32) -> Vec<MatchEntity> {
-        let template = "SELECT `match`.*, {country_a_fields}, {country_b_fields}, {winner_fields} FROM `match`
-         LEFT JOIN `country` as `country_a` on `match`.`countryAId` = `country_a`.`id` 
-         LEFT JOIN `country` as `country_b` on `match`.`countryBId` = `country_b`.`id` 
-         LEFT JOIN `country` as `winner` on `match`.`winnerId` = `winner`.`id` 
-         WHERE `match`.`status` = 'open' AND year(`match`.`date`) = ? AND `match`.`date` <= now()  AND  `match`.`time` >= now();";
+        let _condition= "`match`.`status` = 'open' AND year(`match`.`date`) = ? AND `match`.`date` <= now()  AND  `match`.`time` >= now();";
 
         // for testing only
-        let template =
-            "SELECT `match`.*, {country_a_fields}, {country_b_fields}, {winner_fields} FROM `match`
-         LEFT JOIN `country` as `country_a` on `match`.`countryAId` = `country_a`.`id` 
-         LEFT JOIN `country` as `country_b` on `match`.`countryBId` = `country_b`.`id` 
-         LEFT JOIN `country` as `winner` on `match`.`winnerId` = `winner`.`id` 
-         WHERE `match`.`status` = 'open' AND year(`match`.`date`) = ?";
+        let condition = "`match`.`status` = 'open' AND year(`match`.`date`) = ?";
 
-        let country_a_fields = CountryEntity::generate_join_fields(Some("country_a"));
-        let country_b_fields = CountryEntity::generate_join_fields(Some("country_b"));
-        let winner_fields = CountryEntity::generate_join_fields(Some("winner"));
-
-        let sql = template
-            .replace("{country_a_fields}", &country_a_fields.fields)
-            .replace("{country_b_fields}", &country_b_fields.fields)
-            .replace("{winner_fields}", &winner_fields.fields);
-
+        let built = Self::buil_sql(condition);
         let mut result = Vec::new();
 
-        let mut rows = sqlx::query(sql.as_str())
+        let mut rows = sqlx::query(&built.0)
             .bind(year)
-            .map(|row| {
-                let mut entity = MatchEntity::from_row_ref(&row);
-                entity.country_a = country_a_fields.transform(&row);
-                entity.country_b = country_b_fields.transform(&row);
-                entity.winner = winner_fields.transform(&row);
-
-                entity
-            })
+            .map(built.1)
             .fetch(self.pool.as_ref());
 
         while let Some(entity) = rows.try_next().await.expect("could not get matches") {
