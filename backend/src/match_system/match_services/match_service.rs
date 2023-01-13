@@ -19,4 +19,8 @@ where
     pub async fn get_today_matches(&self, year: Option<i32>) -> Option<Vec<MatchEntity>> {
         self.repo.todays(year).await
     }
+
+    pub async fn get_all_matches(&self, year: i32) -> Vec<MatchEntity> {
+        self.repo.all(year).await
+    }
 }

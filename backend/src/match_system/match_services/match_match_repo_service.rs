@@ -1,5 +1,6 @@
 use crate::{
-    app::app_state::DbPool, country_system::country_entities::CountryEntity,
+    app::app_state::{DbPool, DbRow},
+    country_system::country_entities::CountryEntity,
     match_system::match_entities::match_entity::MatchEntity,
 };
 use async_trait::async_trait;
@@ -9,6 +10,7 @@ use std::sync::Arc;
 #[async_trait]
 pub trait MatchRepoServiceTrait {
     async fn todays(&self, year: Option<i32>) -> Option<Vec<MatchEntity>>;
+    async fn all(&self, year: i32) -> Vec<MatchEntity>;
 }
 
 pub struct MatchRepoService {
@@ -18,6 +20,31 @@ pub struct MatchRepoService {
 impl MatchRepoService {
     pub fn new(pool: Arc<DbPool>) -> Self {
         Self { pool }
+    }
+    fn buil_sql(where_clause: &str) -> (String, impl Fn(DbRow) -> MatchEntity) {
+        let template =
+            "SELECT `match`.*, {country_a_fields}, {country_b_fields}, {winner_fields} FROM `match`
+         LEFT JOIN `country` as `country_a` on `match`.`countryAId` = `country_a`.`id` 
+         LEFT JOIN `country` as `country_b` on `match`.`countryBId` = `country_b`.`id` 
+         LEFT JOIN `country` as `winner` on `match`.`winnerId` = `winner`.`id`";
+
+        let country_a_fields = CountryEntity::generate_join_fields(Some("country_a"));
+        let country_b_fields = CountryEntity::generate_join_fields(Some("country_b"));
+        let winner_fields = CountryEntity::generate_join_fields(Some("winner"));
+
+        let template = template
+            .replace("{country_a_fields}", &country_a_fields.fields)
+            .replace("{country_b_fields}", &country_b_fields.fields)
+            .replace("{winner_fields}", &winner_fields.fields);
+
+        (format!("{} WHERE {}", template, where_clause), move |row| {
+            let mut entity = MatchEntity::from_row_ref(&row);
+            entity.country_a = country_a_fields.transform(&row);
+            entity.country_b = country_b_fields.transform(&row);
+            entity.winner = winner_fields.transform(&row);
+
+            entity
+        })
     }
 }
 
@@ -61,11 +88,27 @@ impl MatchRepoServiceTrait for MatchRepoService {
             })
             .fetch(self.pool.as_ref());
 
-        while let Some(entity) = rows.try_next().await.expect("could not get match") {
+        while let Some(entity) = rows.try_next().await.expect("could not get matches") {
             result.push(entity);
         }
 
         Some(result)
+    }
+
+    async fn all(&self, year: i32) -> Vec<MatchEntity> {
+        let mut result = Vec::new();
+        let built = Self::buil_sql("year(`match`.`date`) = ?");
+
+        let mut rows = sqlx::query(&built.0)
+            .bind(year)
+            .map(built.1)
+            .fetch(self.pool.as_ref());
+
+        while let Some(entity) = rows.try_next().await.expect("could not get matches") {
+            result.push(entity);
+        }
+
+        result
     }
 }
 
