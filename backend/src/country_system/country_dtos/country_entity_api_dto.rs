@@ -29,3 +29,10 @@ impl From<CountryEntity> for CountryEntityApiDto {
         }
     }
 }
+
+
+impl CountryEntityApiDto {
+    pub fn from_entities(entities: Vec<CountryEntity>) -> Vec<Self> {
+        entities.into_iter().map(|e|e.into()).collect()
+    }
+}
