@@ -1,0 +1,1 @@
+pub mod tipping_scoreboard_controller;
