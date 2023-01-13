@@ -5,7 +5,8 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::{env, sync::Arc};
 
 use crate::{
-    api_routes, app::app_state::AppState, country_system, match_system, public_routes, user_system,
+    api_routes, app::app_state::AppState, country_system, match_system, public_routes,
+    tipping_system, user_system,
 };
 
 pub async fn init() -> std::io::Result<()> {
@@ -47,6 +48,10 @@ pub async fn init() -> std::io::Result<()> {
                     app_data.clone(),
                 );
                 user_system::user_services::user_actix_config_service::configure(
+                    config,
+                    app_data.clone(),
+                );
+                tipping_system::tipping_services::tipping_actix_config_service::configure(
                     config,
                     app_data.clone(),
                 );
