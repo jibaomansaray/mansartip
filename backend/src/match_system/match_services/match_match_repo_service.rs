@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 #[async_trait]
 pub trait MatchRepoServiceTrait {
-    async fn todays(&self, year: Option<i32>) -> Option<Vec<MatchEntity>>;
+    async fn todays(&self, year: i32) -> Vec<MatchEntity>;
     async fn all(&self, year: i32) -> Vec<MatchEntity>;
 }
 
@@ -50,7 +50,7 @@ impl MatchRepoService {
 
 #[async_trait]
 impl MatchRepoServiceTrait for MatchRepoService {
-    async fn todays(&self, year: Option<i32>) -> Option<Vec<MatchEntity>> {
+    async fn todays(&self, year: i32) -> Vec<MatchEntity> {
         let template = "SELECT `match`.*, {country_a_fields}, {country_b_fields}, {winner_fields} FROM `match`
          LEFT JOIN `country` as `country_a` on `match`.`countryAId` = `country_a`.`id` 
          LEFT JOIN `country` as `country_b` on `match`.`countryBId` = `country_b`.`id` 
@@ -77,7 +77,7 @@ impl MatchRepoServiceTrait for MatchRepoService {
         let mut result = Vec::new();
 
         let mut rows = sqlx::query(sql.as_str())
-            .bind(year.unwrap_or_default())
+            .bind(year)
             .map(|row| {
                 let mut entity = MatchEntity::from_row_ref(&row);
                 entity.country_a = country_a_fields.transform(&row);
