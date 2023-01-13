@@ -7,6 +7,7 @@ use std::sync::Arc;
 pub trait CountryRepoServiceTrait {
     async fn all(&self) -> Vec<CountryEntity>;
     async fn find_one_by_id(&self, id: i32) -> Option<CountryEntity>;
+    async fn find_one_by_internal_id(&self, id: &str) -> Option<CountryEntity>;
 }
 
 pub struct CountryRepoService {
@@ -38,6 +39,19 @@ impl CountryRepoServiceTrait for CountryRepoService {
 
     async fn find_one_by_id(&self, id: i32) -> Option<CountryEntity> {
         let sql = "SELECT * FROM `country` WHERE `id` = ? AND `deletedAt` IS NULL";
+
+        let mut rows = sqlx::query(sql)
+            .bind(id)
+            .map(CountryEntity::from)
+            .fetch(self.pool.as_ref());
+
+        rows.try_next()
+            .await
+            .expect("clould not find a country by id")
+    }
+
+    async fn find_one_by_internal_id(&self, id: &str) -> Option<CountryEntity> {
+        let sql = "SELECT * FROM `country` WHERE `internalId` = ? AND `deletedAt` IS NULL";
 
         let mut rows = sqlx::query(sql)
             .bind(id)

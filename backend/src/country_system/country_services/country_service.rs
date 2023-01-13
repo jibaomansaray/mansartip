@@ -22,4 +22,9 @@ where
         // @todo check permission
         self.repo.find_one_by_id(id).await
     }
+
+    pub async fn get_country_by_internal_id(&self, id: &str) -> Option<CountryEntity> {
+        // @todo check permission
+        self.repo.find_one_by_internal_id(id).await
+    }
 }
