@@ -16,7 +16,7 @@ impl<T> MatchService<T>
 where
     T: MatchRepoServiceTrait,
 {
-    pub async fn get_today_matches(&self, year: Option<i32>) -> Option<Vec<MatchEntity>> {
+    pub async fn get_today_matches(&self, year: i32) -> Vec<MatchEntity> {
         self.repo.todays(year).await
     }
 
