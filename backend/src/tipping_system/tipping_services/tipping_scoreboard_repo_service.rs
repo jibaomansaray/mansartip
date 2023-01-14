@@ -11,6 +11,11 @@ use crate::{
 #[async_trait]
 pub trait ScoreboardRepoTrait {
     async fn entries(&self, year: i32, limit: u32) -> Vec<ScoreboardEntity>;
+    async fn find_by_user_internal_id(
+        &self,
+        user_internal_id: &str,
+        year: i32,
+    ) -> Option<ScoreboardEntity>;
 }
 
 pub struct ScoreboardRepo {
@@ -69,5 +74,23 @@ impl ScoreboardRepoTrait for ScoreboardRepo {
         }
 
         collection
+    }
+
+    async fn find_by_user_internal_id(
+        &self,
+        user_internal_id: &str,
+        year: i32,
+    ) -> Option<ScoreboardEntity> {
+        let conditon = "year = ? and `tipped_user`.`internalId` = ?";
+        let built = Self::buil_sql(conditon);
+
+        let result = sqlx::query(&built.0)
+            .bind(year)
+            .bind(user_internal_id)
+            .map(built.1)
+            .fetch_one(self.pool.as_ref())
+            .await;
+
+        result.ok()
     }
 }
