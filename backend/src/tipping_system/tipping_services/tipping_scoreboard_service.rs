@@ -16,4 +16,14 @@ where
     pub async fn entries(&self, year: i32, limit: u32) -> Vec<ScoreboardEntity> {
         self.repo.entries(year, limit).await
     }
+
+    pub async fn get_by_user_internal_id(
+        &self,
+        user_internal_id: &str,
+        year: i32,
+    ) -> Option<ScoreboardEntity> {
+        self.repo
+            .find_by_user_internal_id(user_internal_id, year)
+            .await
+    }
 }
