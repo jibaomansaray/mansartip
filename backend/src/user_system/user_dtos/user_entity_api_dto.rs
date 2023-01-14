@@ -9,10 +9,7 @@ pub struct UserEntityDto {
     pub avater: String,
     #[serde(rename = "type")]
     pub username: String,
-    pub email: String,
     pub created_at: Option<DateTime<Utc>>,
-    pub updated_at: Option<DateTime<Utc>>,
-    pub deleted_at: Option<DateTime<Utc>>,
 }
 
 impl UserEntityDto {
@@ -21,10 +18,7 @@ impl UserEntityDto {
             internal_id: entity.internal_id,
             avater: entity.avater,
             username: entity.username,
-            email: entity.email,
             created_at: entity.created_at,
-            updated_at: entity.updated_at,
-            deleted_at: entity.deleted_at,
         }
     }
 }
